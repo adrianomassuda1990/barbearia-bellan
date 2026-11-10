@@ -55,15 +55,15 @@
         </p>
       </div>
 
-      <!-- Indicador de Passos -->
-      <div id="steps-indicator-wrapper" class="flex border-b border-zinc-800 bg-zinc-950/50 px-4 py-3 text-xs font-medium text-zinc-400 justify-between">
-        <button type="button" onclick="voltarParaPasso0()" id="step-0-indicator" class="theme-text font-bold flex items-center gap-1">0. Profissional</button>
-        <span>&gt;</span>
-        <button type="button" onclick="irParaPasso(1)" id="step-1-indicator" class="flex items-center gap-1">1. Serviço</button>
-        <span>&gt;</span>
-        <button type="button" onclick="irParaPasso(2)" id="step-2-indicator" class="flex items-center gap-1">2. Horário</button>
-        <span>&gt;</span>
-        <button type="button" id="step-3-indicator" class="flex items-center gap-1">3. Fim</button>
+      <!-- Indicador de Passos Dinâmico -->
+      <div id="steps-indicator-wrapper" class="flex border-b border-zinc-800 bg-zinc-950/50 px-4 py-3 text-xs font-medium text-zinc-400 justify-between items-center">
+        <button type="button" onclick="irParaPasso(0)" id="step-0-indicator" class="text-zinc-500 transition-all flex items-center gap-1">0. Profissional</button>
+        <span class="text-zinc-700">&gt;</span>
+        <button type="button" onclick="irParaPasso(1)" id="step-1-indicator" class="text-zinc-500 transition-all flex items-center gap-1">1. Serviço</button>
+        <span class="text-zinc-700">&gt;</span>
+        <button type="button" onclick="irParaPasso(2)" id="step-2-indicator" class="text-zinc-500 transition-all flex items-center gap-1">2. Horário</button>
+        <span class="text-zinc-700">&gt;</span>
+        <button type="button" onclick="irParaPasso(3)" id="step-3-indicator" class="text-zinc-500 transition-all flex items-center gap-1">3. Fim</button>
       </div>
 
       <!-- PASSO 0 -->
@@ -173,6 +173,19 @@
       document.documentElement.style.setProperty('--theme-color', mapaCoresHex[corTema] || mapaCoresHex.zinc);
     }
 
+    function atualizarIndicadorPassos(passoAtivo) {
+      for (let i = 0; i <= 3; i++) {
+        const btn = document.getElementById(`step-${i}-indicator`);
+        if (btn) {
+          if (i === passoAtivo) {
+            btn.className = "theme-text font-bold transition-all flex items-center gap-1";
+          } else {
+            btn.className = "text-zinc-500 transition-all flex items-center gap-1";
+          }
+        }
+      }
+    }
+
     function minutosParaHora(m) {
       const h = Math.floor(m / 60); const min = m % 60;
       return `${h < 10 ? '0' + h : h}:${min < 10 ? '0' + min : min}`;
@@ -217,8 +230,10 @@
         if (dadosGlobais.logoUrl) document.getElementById('container-logo').innerHTML = `<img src="${dadosGlobais.logoUrl}" class="w-full h-full object-cover">`;
 
         renderizarBarbeirosCliente();
+        atualizarIndicadorPassos(0);
       } catch (err) {
         renderizarBarbeirosCliente();
+        atualizarIndicadorPassos(0);
       }
     }
 
@@ -252,16 +267,6 @@
       });
     }
 
-    function voltarParaPasso0() {
-      document.getElementById('step-1').classList.add('hidden');
-      document.getElementById('step-2').classList.add('hidden');
-      document.getElementById('step-3').classList.add('hidden');
-      document.getElementById('step-0').classList.remove('hidden');
-      document.getElementById('next-btn').innerHTML = '<span>Avançar para Serviços</span> <i data-lucide="arrow-right" class="w-4 h-4"></i>';
-      currentStep = 0; 
-      lucide.createIcons();
-    }
-
     function irParaPasso(passo) {
       document.getElementById('step-0').classList.add('hidden');
       document.getElementById('step-1').classList.add('hidden');
@@ -288,6 +293,7 @@
         document.getElementById('next-btn').innerHTML = '<span>Finalizar Agendamento</span> <i data-lucide="check" class="w-4 h-4"></i>';
         currentStep = 3;
       }
+      atualizarIndicadorPassos(currentStep);
       lucide.createIcons();
     }
 
