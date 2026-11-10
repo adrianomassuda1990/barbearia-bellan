@@ -42,14 +42,14 @@
   <!-- TELA DE LOGIN -->
   <div id="login-screen" class="w-full max-w-sm bg-zinc-900 p-6 rounded-2xl border border-zinc-800 shadow-2xl space-y-4 mt-12">
     <div class="text-center space-y-2">
-      <div id="login-icon-box" class="w-12 h-12 bg-zinc-800 text-zinc-300 rounded-full flex items-center justify-center mx-auto border border-zinc-700">
+      <div class="w-12 h-12 bg-zinc-800 text-zinc-300 rounded-full flex items-center justify-center mx-auto border border-zinc-700">
         <i data-lucide="lock" class="w-6 h-6"></i>
       </div>
       <h2 class="text-lg font-bold text-zinc-100">Barbearia do Bellan</h2>
       <p class="text-xs text-zinc-400">Insira a senha do painel administrativo</p>
     </div>
     <input type="password" id="input-senha" placeholder="Digite a senha..." class="w-full p-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-zinc-100 focus:ring-2 focus:ring-zinc-400 focus:outline-none text-center">
-    <button onclick="verificarSenha()" id="btn-login-cor" class="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-bold text-sm rounded-xl transition-all shadow-lg">
+    <button onclick="verificarSenha()" class="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-bold text-sm rounded-xl transition-all shadow-lg">
       Entrar no Painel
     </button>
   </div>
@@ -61,19 +61,27 @@
       <div>
         <div class="flex items-center gap-2">
           <h1 id="titulo-topo-admin" class="text-2xl font-bold text-zinc-100 uppercase tracking-tight">Barbearia do Bellan</h1>
-          <span id="badge-tema-cor" class="bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs px-2.5 py-1 rounded-full font-bold">Gestão</span>
+          <span class="bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs px-2.5 py-1 rounded-full font-bold">Gestão</span>
         </div>
-        <p class="text-xs text-zinc-400 mt-1">Painel de Controlo Completo (Firebase Nuvem)</p>
+        <p class="text-xs text-zinc-400 mt-1">Painel de Controlo de Múltiplos Barbeiros</p>
       </div>
       <button onclick="sair()" class="text-xs text-zinc-400 hover:text-red-400 flex items-center gap-1 transition-all">
         <i data-lucide="log-out" class="w-4 h-4"></i> Sair
       </button>
     </div>
 
-    <!-- 1. IDENTIDADE VISUAL, LOGÓTIPO & PALETA DE CORES -->
+    <!-- 0. SELECIONAR BARBEIRO A EDITAR -->
+    <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 space-y-3">
+      <h2 class="text-base font-bold text-zinc-200 flex items-center gap-2">
+        <i data-lucide="user-check" class="w-5 h-5 text-zinc-400"></i> A Gerir a Agenda de:
+      </h2>
+      <select id="select-barbeiro-ativo" onchange="mudarBarbeiroAtivo(this.value)" class="w-full p-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-zinc-100 font-bold focus:outline-none"></select>
+    </div>
+
+    <!-- 1. IDENTIDADE VISUAL & PALETA DE CORES -->
     <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 space-y-4">
       <h2 class="text-base font-bold text-zinc-200 flex items-center gap-2 border-b border-zinc-800 pb-3">
-        <i data-lucide="image" class="w-5 h-5 text-zinc-400"></i> Nome, Logótipo & Paleta de Cores
+        <i data-lucide="image" class="w-5 h-5 text-zinc-400"></i> Identidade & Cores do Estabelecimento
       </h2>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div class="space-y-2">
@@ -81,11 +89,11 @@
           <input type="text" id="input-nome-barbearia" class="w-full p-2.5 bg-zinc-950 border border-zinc-800 rounded-lg text-sm text-zinc-100 focus:outline-none">
         </div>
         <div class="space-y-2">
-          <label class="block text-xs font-bold uppercase text-zinc-400">Logótipo (Telemóvel/PC)</label>
+          <label class="block text-xs font-bold uppercase text-zinc-400">Logótipo</label>
           <input type="file" id="input-arquivo-logo" accept="image/*" onchange="converterLogoParaBase64(this)" class="w-full p-2 bg-zinc-950 border border-zinc-800 rounded-lg text-xs text-zinc-400 file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-zinc-700 file:text-white hover:file:bg-zinc-600">
         </div>
         <div class="space-y-2">
-          <label class="block text-xs font-bold uppercase text-zinc-400">Paleta de Cores (Tema)</label>
+          <label class="block text-xs font-bold uppercase text-zinc-400">Paleta de Cores</label>
           <select id="input-cor-tema" class="w-full p-2.5 bg-zinc-950 border border-zinc-800 rounded-lg text-sm text-zinc-100 focus:outline-none">
             <option value="zinc">Preto & Cinza (Clássico)</option>
             <option value="amber">Dourado / Luxo</option>
@@ -98,40 +106,51 @@
         <span class="text-xs text-zinc-400">Logótipo carregado:</span>
         <img id="preview-logo-img" src="" class="w-12 h-12 rounded-full object-cover border border-zinc-700">
       </div>
-      <button onclick="salvarConfiguracoesServidor('Identidade e cores atualizadas com sucesso!')" class="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-bold text-sm rounded-xl transition-all shadow-lg">
+      <button onclick="salvarConfiguracoesServidor('Identidade atualizada!')" class="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-bold text-sm rounded-xl transition-all shadow-lg">
         Guardar Identidade & Cores
       </button>
+    </div>
+
+    <!-- 1.1 GERIR EQUIPA DE BARBEIROS -->
+    <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 space-y-4">
+      <h2 class="text-base font-bold text-zinc-200 flex items-center gap-2 border-b border-zinc-800 pb-3">
+        <i data-lucide="users" class="w-5 h-5 text-zinc-400"></i> Profissionais da Barbearia
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 bg-zinc-950 p-3 rounded-xl border border-zinc-800">
+        <input type="text" id="novo-barbeiro-nome" placeholder="Nome do Barbeiro (Ex: Bellan)" class="p-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-100 focus:outline-none">
+        <input type="tel" id="novo-barbeiro-whats" placeholder="WhatsApp (Ex: 19999999999)" class="p-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-100 focus:outline-none">
+        <button onclick="adicionarBarbeiro()" class="py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs rounded-lg transition-all flex items-center justify-center gap-1">
+          <i data-lucide="user-plus" class="w-4 h-4"></i> Adicionar Barbeiro
+        </button>
+      </div>
+      <div class="space-y-2" id="lista-barbeiros-admin"></div>
     </div>
 
     <!-- 2. CANAIS & SEGURANÇA -->
     <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 space-y-4">
       <h2 class="text-base font-bold text-zinc-200 flex items-center gap-2 border-b border-zinc-800 pb-3">
-        <i data-lucide="share-2" class="w-5 h-5 text-zinc-400"></i> Canais & Senha do Painel
+        <i data-lucide="share-2" class="w-5 h-5 text-zinc-400"></i> WhatsApp do Profissional & Senha
       </h2>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-2">
-          <label class="block text-xs font-bold uppercase text-zinc-400">WhatsApp</label>
-          <input type="tel" id="input-whats-yukio" class="w-full p-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-100 focus:outline-none">
+          <label class="block text-xs font-bold uppercase text-zinc-400">WhatsApp do Barbeiro Ativo</label>
+          <input type="tel" id="input-whats-barbeiro" class="w-full p-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-100 focus:outline-none">
         </div>
         <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-2">
-          <label class="block text-xs font-bold uppercase text-zinc-400">Instagram (@)</label>
-          <input type="text" id="input-instagram-yukio" class="w-full p-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-100 focus:outline-none">
-        </div>
-        <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-2">
-          <label class="block text-xs font-bold uppercase text-zinc-400">Nova Senha</label>
+          <label class="block text-xs font-bold uppercase text-zinc-400">Nova Senha do Painel</label>
           <input type="password" id="input-nova-senha" placeholder="Deixe em branco" class="w-full p-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-100 focus:outline-none">
         </div>
       </div>
-      <button onclick="salvarConfiguracoesServidor('Canais e segurança atualizados!')" class="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-bold text-sm rounded-xl transition-all shadow-lg">
+      <button onclick="salvarConfiguracoesServidor('Canais e senha atualizados!')" class="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-bold text-sm rounded-xl transition-all shadow-lg">
         Guardar Canais e Senha
       </button>
     </div>
 
-    <!-- 3. AGENDA DO DIA & ENVIO EM MASSA -->
+    <!-- 3. AGENDA DO DIA -->
     <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 space-y-4">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-zinc-800 pb-3">
         <h2 class="text-base font-bold text-zinc-200 flex items-center gap-2">
-          <i data-lucide="calendar" class="w-5 h-5 text-zinc-400"></i> Agenda & Lembretes para os Clientes do Dia
+          <i data-lucide="calendar" class="w-5 h-5 text-zinc-400"></i> Agenda do Barbeiro Selecionado
         </h2>
         <button onclick="copiarResumoDiaParaTodos()" class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs rounded-lg transition-all flex items-center gap-1.5 shadow-md">
           <i data-lucide="share-2" class="w-4 h-4"></i> Copiar Lista Completa do Dia
@@ -152,7 +171,7 @@
     <!-- 4. CRIAR RESERVA MANUAL -->
     <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 space-y-4">
       <h2 class="text-base font-bold text-zinc-200 flex items-center gap-2 border-b border-zinc-800 pb-3">
-        <i data-lucide="user-plus" class="w-5 h-5 text-zinc-400"></i> Criar Agendamento Manual (Barbeiro)
+        <i data-lucide="user-plus" class="w-5 h-5 text-zinc-400"></i> Criar Agendamento Manual
       </h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-zinc-950 p-4 rounded-xl border border-zinc-800">
         <div>
@@ -222,22 +241,21 @@
   <script>
     lucide.createIcons();
 
-    let dadosServidor = {
+    let dadosGerais = {
       nomeBarbearia: "Barbearia do Bellan",
       logoUrl: "",
       senhaBellan: "1234",
-      whatsBellan: "",
-      instagramBellan: "",
       corTema: "zinc",
-      servicos: [
-        { id: 'corte', nome: 'Corte de Cabelo', preco: 40, duracao: 40 },
-        { id: 'barba', nome: 'Barba', preco: 30, duracao: 30 }
-      ],
-      diasFechados: [],
-      horariosPausaPadrao: [],
-      horariosBloqueadosPorData: {},
-      agendamentos: []
+      barbeiros: [
+        { id: 'bellan', nome: 'Bellan', whats: '', servicos: [{ id: 'corte', nome: 'Corte de Cabelo', preco: 40, duracao: 40 }], diasFechados: [], horariosPausaPadrao: [], horariosBloqueadosPorData: {} }
+      ]
     };
+
+    let barbeiroAtivoId = 'bellan';
+
+    function obterDadosBarbeiroAtivo() {
+      return dadosGerais.barbeiros.find(b => b.id === barbeiroAtivoId) || dadosGerais.barbeiros[0];
+    }
 
     function gerarHorarios30min() {
       const lista = [];
@@ -262,28 +280,70 @@
     async function carregarDadosServidor() {
       if (!window.dbFirestore) return;
       try {
-        const docRef = window.fsDoc(window.dbFirestore, "configuracoes", "barbearia_bellan");
+        const docRef = window.fsDoc(window.dbFirestore, "configuracoes", "barbearia_bellan_multi");
         const docSnap = await window.fsGetDoc(docRef);
         
         if (docSnap.exists()) {
           const data = docSnap.data();
           if (data) {
-            dadosServidor = { ...dadosServidor, ...data };
+            dadosGerais = { ...dadosGerais, ...data };
           }
         }
 
-        const agendamentosRef = window.fsCollection(window.dbFirestore, "agendamentos_bellan");
+        const agendamentosRef = window.fsCollection(window.dbFirestore, "agendamentos_bellan_multi");
         const agendamentosSnap = await window.fsGetDocs(agendamentosRef);
-        let listaAgendamentos = [];
         
-        agendamentosSnap.forEach((docItem) => {
-          listaAgendamentos.push(docItem.data());
-        });
-        dadosServidor.agendamentos = listaAgendamentos;
+        // Limpa agendamentos antigos para reatribuir por barbeiro
+        dadosGerais.barbeiros.forEach(b => b.agendamentos = []);
 
+        agendamentosSnap.forEach((docItem) => {
+          const ag = docItem.data();
+          const barbeiroAlvo = dadosGerais.barbeiros.find(b => b.id === ag.barbeiroId);
+          if (barbeiroAlvo) {
+            if (!barbeiroAlvo.agendamentos) barbeiroAlvo.agendamentos = [];
+            barbeiroAlvo.agendamentos.push(ag);
+          }
+        });
+
+        atualizarSelectBarbeiros();
+        carregarCamposPainel();
       } catch (err) {
-        console.error("Erro ao carregar dados do Firebase:", err);
+        console.error("Erro ao carregar do Firebase:", err);
       }
+    }
+
+    function atualizarSelectBarbeiros() {
+      const select = document.getElementById('select-barbeiro-ativo');
+      select.innerHTML = '';
+      dadosGerais.barbeiros.forEach(b => {
+        const opt = document.createElement('option');
+        opt.value = b.id;
+        opt.innerText = `💈 ${b.nome}`;
+        if (b.id === barbeiroAtivoId) opt.selected = true;
+        select.appendChild(opt);
+      });
+    }
+
+    function mudarBarbeiroAtivo(id) {
+      barbeiroAtivoId = id;
+      carregarCamposPainel();
+    }
+
+    function carregarCamposPainel() {
+      const bAtivo = obterDadosBarbeiroAtivo();
+      document.getElementById('input-nome-barbearia').value = dadosGerais.nomeBarbearia || "Barbearia do Bellan";
+      document.getElementById('input-whats-barbeiro').value = bAtivo.whats || "";
+      document.getElementById('input-cor-tema').value = dadosGerais.corTema || "zinc";
+      document.getElementById('titulo-topo-admin').innerText = dadosGerais.nomeBarbearia;
+
+      if (dadosGerais.logoUrl) {
+        document.getElementById('preview-logo-img').src = dadosGerais.logoUrl;
+        document.getElementById('preview-logo-container').classList.remove('hidden');
+        document.getElementById('preview-logo-container').classList.add('flex');
+      }
+
+      renderizarBarbeirosEquipa();
+      renderizarTudo();
     }
 
     function converterLogoParaBase64(input) {
@@ -291,7 +351,7 @@
       if (file) {
         const reader = new FileReader();
         reader.onload = function(e) {
-          dadosServidor.logoUrl = e.target.result;
+          dadosGerais.logoUrl = e.target.result;
           document.getElementById('preview-logo-img').src = e.target.result;
           document.getElementById('preview-logo-container').classList.remove('hidden');
           document.getElementById('preview-logo-container').classList.add('flex');
@@ -301,13 +361,14 @@
     }
 
     async function salvarConfiguracoesServidor(mensagemSucesso = "Configurações salvas!") {
-      dadosServidor.nomeBarbearia = document.getElementById('input-nome-barbearia').value.trim() || "Barbearia do Bellan";
-      dadosServidor.whatsBellan = document.getElementById('input-whats-yukio').value.trim();
-      dadosServidor.instagramBellan = document.getElementById('input-instagram-yukio').value.trim();
-      dadosServidor.corTema = document.getElementById('input-cor-tema').value;
+      dadosGerais.nomeBarbearia = document.getElementById('input-nome-barbearia').value.trim() || "Barbearia do Bellan";
+      dadosGerais.corTema = document.getElementById('input-cor-tema').value;
       
+      const bAtivo = obterDadosBarbeiroAtivo();
+      bAtivo.whats = document.getElementById('input-whats-barbeiro').value.trim();
+
       const novaSenha = document.getElementById('input-nova-senha').value.trim();
-      if (novaSenha) dadosServidor.senhaBellan = novaSenha;
+      if (novaSenha) dadosGerais.senhaBellan = novaSenha;
 
       if (!window.dbFirestore) {
         alert("Erro: Firebase não inicializado.");
@@ -315,23 +376,17 @@
       }
 
       try {
-        await window.fsSetDoc(window.fsDoc(window.dbFirestore, "configuracoes", "barbearia_bellan"), {
-          nomeBarbearia: dadosServidor.nomeBarbearia,
-          logoUrl: dadosServidor.logoUrl,
-          senhaBellan: dadosServidor.senhaBellan,
-          whatsBellan: dadosServidor.whatsBellan,
-          instagramBellan: dadosServidor.instagramBellan,
-          corTema: dadosServidor.corTema,
-          servicos: dadosServidor.servicos,
-          diasFechados: dadosServidor.diasFechados,
-          horariosPausaPadrao: dadosServidor.horariosPausaPadrao,
-          horariosBloqueadosPorData: dadosServidor.horariosBloqueadosPorData || {}
+        await window.fsSetDoc(window.fsDoc(window.dbFirestore, "configuracoes", "barbearia_bellan_multi"), {
+          nomeBarbearia: dadosGerais.nomeBarbearia,
+          logoUrl: dadosGerais.logoUrl,
+          senhaBellan: dadosGerais.senhaBellan,
+          corTema: dadosGerais.corTema,
+          barbeiros: dadosGerais.barbeiros
         });
 
         if (novaSenha) document.getElementById('input-nova-senha').value = '';
         alert(mensagemSucesso);
         await carregarDadosServidor();
-        renderizarTudo();
       } catch (err) {
         console.error(err);
         alert("Erro ao salvar no Firestore.");
@@ -341,34 +396,71 @@
     async function verificarSenha() {
       await carregarDadosServidor();
       const senhaDigitada = document.getElementById('input-senha').value;
-      if (senhaDigitada === (dadosServidor.senhaBellan || "1234")) {
+      if (senhaDigitada === (dadosGerais.senhaBellan || "1234")) {
         document.getElementById('login-screen').classList.add('hidden');
         document.getElementById('admin-content').classList.remove('hidden');
-        
-        document.getElementById('input-nome-barbearia').value = dadosServidor.nomeBarbearia || "Barbearia do Bellan";
-        document.getElementById('input-whats-yukio').value = dadosServidor.whatsBellan || "";
-        document.getElementById('input-instagram-yukio').value = dadosServidor.instagramBellan || "";
-        document.getElementById('input-cor-tema').value = dadosServidor.corTema || "zinc";
-        document.getElementById('titulo-topo-admin').innerText = dadosServidor.nomeBarbearia;
-
-        if (dadosServidor.logoUrl) {
-          document.getElementById('preview-logo-img').src = dadosServidor.logoUrl;
-          document.getElementById('preview-logo-container').classList.remove('hidden');
-          document.getElementById('preview-logo-container').classList.add('flex');
-        }
-        
-        renderizarTudo();
+        carregarCamposPainel();
       } else {
         alert("Senha incorreta!");
       }
     }
 
+    function renderizarBarbeirosEquipa() {
+      const container = document.getElementById('lista-barbeiros-admin');
+      container.innerHTML = '';
+      dadosGerais.barbeiros.forEach((b, idx) => {
+        const div = document.createElement('div');
+        div.className = "p-3 bg-zinc-950 rounded-xl border border-zinc-800 flex items-center justify-between gap-3";
+        div.innerHTML = `
+          <div>
+            <div class="text-sm font-bold text-zinc-100">${b.nome}</div>
+            <div class="text-xs text-zinc-400">WhatsApp: ${b.whats || 'Não definido'}</div>
+          </div>
+          ${dadosGerais.barbeiros.length > 1 ? `<button onclick="removerBarbeiro(${idx})" class="p-2 text-zinc-500 hover:text-red-400 transition-all"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
+        `;
+        container.appendChild(div);
+      });
+      lucide.createIcons();
+    }
+
+    async function adicionarBarbeiro() {
+      const nome = document.getElementById('novo-barbeiro-nome').value.trim();
+      const whats = document.getElementById('novo-barbeiro-whats').value.trim();
+      if (!nome) { alert("Insira o nome do barbeiro!"); return; }
+
+      const novoId = nome.toLowerCase().replace(/\s+/g, '_') + '_' + Date.now();
+      dadosGerais.barbeiros.push({
+        id: novoId,
+        nome: nome,
+        whats: whats,
+        servicos: [{ id: 'corte', nome: 'Corte de Cabelo', preco: 40, duracao: 40 }],
+        diasFechados: [],
+        horariosPausaPadrao: [],
+        horariosBloqueadosPorData: {}
+      });
+
+      document.getElementById('novo-barbeiro-nome').value = '';
+      document.getElementById('novo-barbeiro-whats').value = '';
+      await salvarConfiguracoesServidor("Barbeiro adicionado com sucesso!");
+    }
+
+    async function removerBarbeiro(index) {
+      if (dadosGerais.barbeiros.length <= 1) {
+        alert("A barbearia precisa de ter pelo menos um barbeiro registado.");
+        return;
+      }
+      dadosGerais.barbeiros.splice(index, 1);
+      barbeiroAtivoId = dadosGerais.barbeiros[0].id;
+      await salvarConfiguracoesServidor("Barbeiro removido!");
+    }
+
     function renderizarAgendaDoDia() {
+      const bAtivo = obterDadosBarbeiroAtivo();
       const dataFiltro = document.getElementById('filtro-data-agenda').value;
       const container = document.getElementById('lista-agendamentos-dia');
       container.innerHTML = '';
 
-      const agendamentos = dadosServidor.agendamentos || [];
+      const agendamentos = bAtivo.agendamentos || [];
       const doDia = agendamentos.filter(a => a.data === dataFiltro);
 
       if (doDia.length === 0) {
@@ -382,7 +474,7 @@
         const div = document.createElement('div');
         div.className = "p-3 bg-zinc-900 border border-zinc-800 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3";
         
-        const textoLembrete = `Olá ${ag.cliente}, tudo bem? Aqui é da ${dadosServidor.nomeBarbearia || 'Barbearia do Bellan'}. Passando para lembrar do seu agendamento hoje às ${ag.horario} (${ag.servico}). Confirmado?`;
+        const textoLembrete = `Olá ${ag.cliente}, tudo bem? Aqui é do ${dadosGerais.nomeBarbearia || 'Estabelecimento'}. Passando para lembrar do seu agendamento com ${bAtivo.nome} hoje às ${ag.horario} (${ag.servico}). Confirmado?`;
 
         let numeroLimpo = (ag.whatsapp || '').replace(/\D/g, '');
         let linkWhats = "#";
@@ -413,45 +505,26 @@
 
     function copiarTexto(texto) {
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(texto).then(() => {
-          alert("📋 Mensagem copiada com sucesso!");
-        }).catch(() => {
-          forcarCopiaManual(texto);
-        });
-      } else {
-        forcarCopiaManual(texto);
+        navigator.clipboard.writeText(texto).then(() => alert("📋 Mensagem copiada com sucesso!"));
       }
-    }
-
-    function forcarCopiaManual(texto) {
-      const textarea = document.createElement('textarea');
-      textarea.value = texto;
-      document.body.appendChild(textarea);
-      textarea.select();
-      try {
-        document.execCommand('copy');
-        alert("📋 Mensagem copiada com sucesso!");
-      } catch (err) {
-        alert("Não foi possível copiar automaticamente.");
-      }
-      document.body.removeChild(textarea);
     }
 
     function copiarResumoDiaParaTodos() {
+      const bAtivo = obterDadosBarbeiroAtivo();
       const dataFiltro = document.getElementById('filtro-data-agenda').value;
-      const agendamentos = dadosServidor.agendamentos || [];
+      const agendamentos = bAtivo.agendamentos || [];
       const doDia = agendamentos.filter(a => a.data === dataFiltro);
 
       if (doDia.length === 0) {
-        alert("Não há agendamentos nesta data para copiar.");
+        alert("Não há agendamentos nesta data.");
         return;
       }
 
       doDia.sort((a, b) => a.horario.localeCompare(b.horario));
       const dataFormatada = dataFiltro.split('-').reverse().join('/');
 
-      let resumo = `📅 *AGENDA - ${dataFormatada}*\n`;
-      resumo += `💈 *${dadosServidor.nomeBarbearia || 'Barbearia do Bellan'}*\n\n`;
+      let resumo = `📅 *AGENDA - ${dataFormatada}* (${bAtivo.nome})\n`;
+      resumo += `💈 *${dadosGerais.nomeBarbearia || 'Barbearia'}*\n\n`;
 
       doDia.forEach((ag, idx) => {
         resumo += `${idx + 1}. *${ag.horario}* - ${ag.cliente} (${ag.servico})\n`;
@@ -461,12 +534,15 @@
     }
 
     function renderizarServicos() {
+      const bAtivo = obterDadosBarbeiroAtivo();
       const container = document.getElementById('lista-servicos-admin');
       const selectManual = document.getElementById('manual-servico');
       container.innerHTML = '';
       selectManual.innerHTML = '';
 
-      dadosServidor.servicos.forEach((s, index) => {
+      if (!bAtivo.servicos) bAtivo.servicos = [];
+
+      bAtivo.servicos.forEach((s, index) => {
         const div = document.createElement('div');
         div.className = "p-3 bg-zinc-950 rounded-xl border border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-3";
         div.innerHTML = `
@@ -504,12 +580,13 @@
     }
 
     async function adicionarServico() {
+      const bAtivo = obterDadosBarbeiroAtivo();
       const nome = document.getElementById('novo-servico-nome').value;
       const preco = document.getElementById('novo-servico-preco').value;
       const duracao = document.getElementById('novo-servico-duracao').value || 30;
       if (!nome || !preco) { alert("Preencha nome e valor!"); return; }
       
-      dadosServidor.servicos.push({ id: 'srv-' + Date.now(), nome, preco: Number(preco), duracao: Number(duracao) });
+      bAtivo.servicos.push({ id: 'srv-' + Date.now(), nome, preco: Number(preco), duracao: Number(duracao) });
       document.getElementById('novo-servico-nome').value = '';
       document.getElementById('novo-servico-preco').value = '';
       document.getElementById('novo-servico-duracao').value = '';
@@ -518,17 +595,20 @@
     }
 
     async function atualizarServico(index, campo, valor) {
-      dadosServidor.servicos[index][campo] = campo === 'nome' ? valor : Number(valor);
+      const bAtivo = obterDadosBarbeiroAtivo();
+      bAtivo.servicos[index][campo] = campo === 'nome' ? valor : Number(valor);
       await salvarConfiguracoesServidor("Serviço atualizado!");
     }
 
     async function removerServico(index) {
-      dadosServidor.servicos.splice(index, 1);
+      const bAtivo = obterDadosBarbeiroAtivo();
+      bAtivo.servicos.splice(index, 1);
       renderizarServicos();
       await salvarConfiguracoesServidor("Serviço removido!");
     }
 
     async function criarAgendamentoManual() {
+      const bAtivo = obterDadosBarbeiroAtivo();
       const nome = document.getElementById('manual-nome').value.trim();
       const servicoObj = JSON.parse(document.getElementById('manual-servico').value);
       const data = document.getElementById('manual-data').value;
@@ -554,7 +634,8 @@
       }
 
       try {
-        await window.fsAddDoc(window.fsCollection(window.dbFirestore, "agendamentos_bellan"), {
+        await window.fsAddDoc(window.fsCollection(window.dbFirestore, "agendamentos_bellan_multi"), {
+          barbeiroId: bAtivo.id,
           cliente: nome,
           servico: servicoObj.nome,
           preco: servicoObj.preco,
@@ -572,15 +653,18 @@
         renderizarAgendaDoDia();
       } catch (err) {
         console.error(err);
-        alert("Erro ao criar agendamento no Firestore.");
+        alert("Erro ao criar agendamento.");
       }
     }
 
     function renderizarDias() {
+      const bAtivo = obterDadosBarbeiroAtivo();
       const container = document.getElementById('grid-dias-semana');
       container.innerHTML = '';
+      if (!bAtivo.diasFechados) bAtivo.diasFechados = [];
+
       diasSemana.forEach(dia => {
-        const isFechado = dadosServidor.diasFechados.includes(dia.id);
+        const isFechado = bAtivo.diasFechados.includes(dia.id);
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.onclick = () => toggleDia(dia.id);
@@ -593,22 +677,25 @@
     }
 
     async function toggleDia(idDia) {
-      if (dadosServidor.diasFechados.includes(idDia)) {
-        dadosServidor.diasFechados = dadosServidor.diasFechados.filter(d => d !== idDia);
+      const bAtivo = obterDadosBarbeiroAtivo();
+      if (!bAtivo.diasFechados) bAtivo.diasFechados = [];
+      if (bAtivo.diasFechados.includes(idDia)) {
+        bAtivo.diasFechados = bAtivo.diasFechados.filter(d => d !== idDia);
       } else {
-        dadosServidor.diasFechados.push(idDia);
+        bAtivo.diasFechados.push(idDia);
       }
       renderizarDias();
       await salvarConfiguracoesServidor("Dias atualizados!");
     }
 
     function renderizarHorariosPausaPadrao() {
+      const bAtivo = obterDadosBarbeiroAtivo();
       const grid = document.getElementById('grid-horarios-pausa-padrao');
       grid.innerHTML = '';
-      if (!dadosServidor.horariosPausaPadrao) dadosServidor.horariosPausaPadrao = [];
+      if (!bAtivo.horariosPausaPadrao) bAtivo.horariosPausaPadrao = [];
 
       horariosLista.forEach(hora => {
-        const isPausa = dadosServidor.horariosPausaPadrao.includes(hora);
+        const isPausa = bAtivo.horariosPausaPadrao.includes(hora);
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = isPausa 
@@ -618,11 +705,11 @@
         btn.innerHTML = `<span>${hora}</span><span class="text-[10px] px-1.5 py-0.2 rounded font-bold ${isPausa ? 'bg-red-500/20 text-red-400' : 'bg-zinc-700 text-zinc-300'}">${isPausa ? 'Indisponível' : 'Disponível'}</span>`;
 
         btn.onclick = () => {
-          if (!dadosServidor.horariosPausaPadrao) dadosServidor.horariosPausaPadrao = [];
-          if (dadosServidor.horariosPausaPadrao.includes(hora)) {
-            dadosServidor.horariosPausaPadrao = dadosServidor.horariosPausaPadrao.filter(h => h !== hora);
+          if (!bAtivo.horariosPausaPadrao) bAtivo.horariosPausaPadrao = [];
+          if (bAtivo.horariosPausaPadrao.includes(hora)) {
+            bAtivo.horariosPausaPadrao = bAtivo.horariosPausaPadrao.filter(h => h !== hora);
           } else {
-            dadosServidor.horariosPausaPadrao.push(hora);
+            bAtivo.horariosPausaPadrao.push(hora);
           }
           renderizarHorariosPausaPadrao();
         };
