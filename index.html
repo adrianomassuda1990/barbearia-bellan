@@ -7,7 +7,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- Firebase SDKs via CDN -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, getDoc, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -46,7 +45,6 @@
   <div class="w-full max-w-md bg-zinc-900 min-h-screen sm:min-h-[750px] sm:rounded-3xl shadow-2xl flex flex-col justify-between overflow-hidden relative border border-zinc-800">
     
     <div>
-      <!-- Header Dinâmico -->
       <div class="bg-gradient-to-b from-zinc-800 to-zinc-900 text-white p-6 text-center relative border-b border-zinc-800">
         <div id="container-logo" class="w-20 h-20 rounded-full border-2 theme-border shadow-lg mx-auto overflow-hidden bg-zinc-950 flex items-center justify-center mb-2">
           <i data-lucide="scissors" class="w-10 h-10 theme-text"></i>
@@ -57,7 +55,6 @@
         </p>
       </div>
 
-      <!-- Indicador de Passos -->
       <div id="steps-indicator-wrapper" class="flex border-b border-zinc-800 bg-zinc-950/50 px-4 py-3 text-xs font-medium text-zinc-400 justify-between">
         <button type="button" onclick="voltarParaPasso0()" id="step-0-indicator" class="theme-text font-bold flex items-center gap-1">0. Profissional</button>
         <span>&gt;</span>
@@ -68,7 +65,7 @@
         <button type="button" id="step-3-indicator" class="flex items-center gap-1">3. Fim</button>
       </div>
 
-      <!-- PASSO 0: ESCOLHER PROFISSIONAL -->
+      <!-- PASSO 0 -->
       <div id="step-0" class="p-5 space-y-4">
         <div>
           <label class="block text-xs font-bold uppercase text-zinc-400 mb-2">Selecione o Profissional</label>
@@ -78,7 +75,7 @@
         </div>
       </div>
 
-      <!-- PASSO 1: SERVIÇO -->
+      <!-- PASSO 1 -->
       <div id="step-1" class="p-5 space-y-5 hidden">
         <div>
           <label class="block text-xs font-bold uppercase text-zinc-400 mb-2">Selecione o Serviço</label>
@@ -86,7 +83,7 @@
         </div>
       </div>
 
-      <!-- PASSO 2: DATA E HORÁRIO -->
+      <!-- PASSO 2 -->
       <div id="step-2" class="p-5 space-y-5 hidden">
         <div>
           <label class="block text-xs font-bold uppercase text-zinc-400 mb-2">Selecione a Data</label>
@@ -105,11 +102,11 @@
         </div>
       </div>
 
-      <!-- PASSO 3: CONFIRMAÇÃO -->
+      <!-- PASSO 3 -->
       <div id="step-3" class="p-5 space-y-4 hidden">
         <div class="p-3 bg-zinc-800/50 border border-zinc-700 rounded-xl text-xs text-zinc-300 flex items-start gap-2">
           <i data-lucide="alert-circle" class="w-5 h-5 shrink-0 text-zinc-400"></i>
-          <span>Informe o seu nome e WhatsApp para concluir o agendamento com <b id="nome-barbeiro-resumo" class="theme-text"></b>.</span>
+          <span>Agendamento com <b id="nome-barbeiro-resumo" class="theme-text"></b>.</span>
         </div>
         <div>
           <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Seu Nome Completo *</label>
@@ -121,7 +118,7 @@
         </div>
       </div>
 
-      <!-- PASSO 4: SUCESSO -->
+      <!-- PASSO 4 -->
       <div id="step-4" class="p-6 text-center space-y-4 hidden my-auto">
         <div class="w-16 h-16 bg-emerald-500/20 text-emerald-500 rounded-full flex items-center justify-center mx-auto border border-emerald-500/40 shadow-xl">
           <i data-lucide="check-circle-2" class="w-10 h-10"></i>
@@ -130,24 +127,21 @@
           <h2 class="text-xl font-bold text-zinc-100">Agendamento Registado!</h2>
           <div class="p-3.5 bg-zinc-800/50 border border-zinc-700 rounded-xl text-xs text-zinc-300 space-y-1">
             <p class="font-bold text-white">📋 Mensagem copiada automaticamente!</p>
-            <p id="aviso-instrucao-canal">A abrir o WhatsApp do profissional...</p>
+            <p id="aviso-instrucao-canal">A abrir o WhatsApp...</p>
           </div>
         </div>
         <div id="container-botoes-manuais" class="space-y-2 pt-2"></div>
-        <button onclick="location.reload()" class="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold text-xs rounded-xl transition-all mt-3">
-          Fazer Novo Agendamento
-        </button>
+        <button onclick="location.reload()" class="w-full py-3 bg-zinc-800 text-zinc-300 font-bold text-xs rounded-xl mt-3">Novo Agendamento</button>
       </div>
     </div>
 
-    <!-- Rodapé -->
     <div id="footer-actions" class="p-4 bg-zinc-900 border-t border-zinc-800 flex flex-col gap-3">
       <button id="next-btn" onclick="nextStep()" class="w-full py-3.5 theme-bg text-zinc-950 font-bold text-sm rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
         <span>Avançar para Serviços</span>
         <i data-lucide="arrow-right" class="w-4 h-4"></i>
       </button>
       <div class="text-center pt-1">
-        <a href="admin.html" class="text-[11px] text-zinc-500 hover:text-zinc-300 flex items-center justify-center gap-1 transition-all">
+        <a href="admin.html" class="text-[11px] text-zinc-500 hover:text-zinc-300 flex items-center justify-center gap-1">
           <i data-lucide="lock" class="w-3 h-3"></i> Painel do Barbeiro
         </a>
       </div>
@@ -167,31 +161,25 @@
       nomeBarbearia: "Barbearia do Bellan",
       logoUrl: "",
       corTema: "zinc",
-      barbeiros: []
+      barbeiros: [
+        { id: 'bellan', nome: 'Bellan', whats: '', servicos: [{ id: 'corte', nome: 'Corte de Cabelo', preco: 40, duracao: 40 }], diasFechados: [], horariosPausaPadrao: [] }
+      ]
     };
 
-    const mapaCoresHex = {
-      zinc: "#d4d4d8",
-      amber: "#fbbf24",
-      emerald: "#34d399",
-      blue: "#60a5fa"
-    };
+    const mapaCoresHex = { zinc: "#d4d4d8", amber: "#fbbf24", emerald: "#34d399", blue: "#60a5fa" };
 
     function aplicarTemaVisual(corTema) {
-      const hex = mapaCoresHex[corTema] || mapaCoresHex.zinc;
-      document.documentElement.style.setProperty('--theme-color', hex);
+      document.documentElement.style.setProperty('--theme-color', mapaCoresHex[corTema] || mapaCoresHex.zinc);
     }
 
-    function minutosParaHora(minutosTotal) {
-      const h = Math.floor(minutosTotal / 60);
-      const m = minutosTotal % 60;
-      return `${h < 10 ? '0' + h : h}:${m < 10 ? '0' + m : m}`;
+    function minutosParaHora(m) {
+      const h = Math.floor(m / 60); const min = m % 60;
+      return `${h < 10 ? '0' + h : h}:${min < 10 ? '0' + min : min}`;
     }
 
     const inputData = document.getElementById('data-agendamento');
     const hojeStr = new Date().toISOString().split('T')[0];
-    inputData.min = hojeStr;
-    inputData.value = hojeStr;
+    inputData.min = hojeStr; inputData.value = hojeStr;
 
     async function carregarDadosFirebase() {
       if (!window.dbFirestore) return;
@@ -201,9 +189,14 @@
         
         if (docSnap.exists()) {
           const data = docSnap.data();
-          if (data) {
+          if (data && data.barbeiros && data.barbeiros.length > 0) {
             dadosGlobais = { ...dadosGlobais, ...data };
           }
+        }
+
+        // Garante obrigatoriamente que o Bellan está na lista
+        if (!dadosGlobais.barbeiros.some(b => b.id === 'bellan')) {
+          dadosGlobais.barbeiros.unshift({ id: 'bellan', nome: 'Bellan', whats: '', servicos: [{ id: 'corte', nome: 'Corte', preco: 40, duracao: 40 }], diasFechados: [], horariosPausaPadrao: [] });
         }
 
         const agendamentosRef = window.fsCollection(window.dbFirestore, "agendamentos_bellan_multi");
@@ -220,18 +213,12 @@
         });
 
         aplicarTemaVisual(dadosGlobais.corTema || 'zinc');
-
-        if (dadosGlobais.nomeBarbearia) {
-          document.getElementById('nome-barbearia-cliente').innerText = dadosGlobais.nomeBarbearia;
-          document.title = dadosGlobais.nomeBarbearia + " - Agendamento";
-        }
-        if (dadosGlobais.logoUrl) {
-          document.getElementById('container-logo').innerHTML = `<img src="${dadosGlobais.logoUrl}" class="w-full h-full object-cover">`;
-        }
+        if (dadosGlobais.nomeBarbearia) document.getElementById('nome-barbearia-cliente').innerText = dadosGlobais.nomeBarbearia;
+        if (dadosGlobais.logoUrl) document.getElementById('container-logo').innerHTML = `<img src="${dadosGlobais.logoUrl}" class="w-full h-full object-cover">`;
 
         renderizarBarbeirosCliente();
       } catch (err) {
-        console.error("Erro ao carregar do Firebase:", err);
+        renderizarBarbeirosCliente();
       }
     }
 
@@ -239,51 +226,37 @@
       const container = document.getElementById('container-barbeiros-cliente');
       container.innerHTML = '';
 
-      if (!dadosGlobais.barbeiros || dadosGlobais.barbeiros.length === 0) {
-        container.innerHTML = `<p class="text-xs text-zinc-500 text-center py-4">Nenhum profissional disponível no momento.</p>`;
-        return;
+      if (!barbeiroEscolhido && dadosGlobais.barbeiros.length > 0) {
+        barbeiroEscolhido = dadosGlobais.barbeiros[0];
       }
 
-      dadosGlobais.barbeiros.forEach((b, idx) => {
-        if (idx === 0 && !barbeiroEscolhido) barbeiroEscolhido = b;
-        const div = document.createElement('div');
+      dadosGlobais.barbeiros.forEach((b) => {
         const isSel = barbeiroEscolhido && barbeiroEscolhido.id === b.id;
-
-        div.className = isSel
-          ? "card-barbeiro p-4 border-2 theme-border rounded-2xl bg-zinc-800/80 cursor-pointer transition-all flex items-center justify-between"
-          : "card-barbeiro p-4 border-2 border-zinc-800 rounded-2xl hover:border-zinc-700 cursor-pointer transition-all bg-zinc-950/40 flex items-center justify-between";
-        
-        div.onclick = () => selecionarBarbeiro(div, b);
+        const div = document.createElement('div');
+        div.className = isSel ? "p-4 border-2 theme-border rounded-2xl bg-zinc-800/80 cursor-pointer flex items-center justify-between" : "p-4 border-2 border-zinc-800 rounded-2xl cursor-pointer bg-zinc-950/40 flex items-center justify-between";
+        div.onclick = () => {
+          barbeiroEscolhido = b;
+          renderizarBarbeirosCliente();
+        };
         div.innerHTML = `
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center font-bold theme-text border border-zinc-700">${b.nome.charAt(0)}</div>
             <div>
-              <div class="font-bold text-sm text-zinc-100">${b.nome}</div>
+              <div class="font-bold text-sm text-zinc-100">${b.nome} ${b.id === 'bellan' ? '(Proprietário)' : ''}</div>
               <div class="text-xs text-zinc-400">Profissional Especializado</div>
             </div>
           </div>
-          <input type="radio" name="barbeiro" value="${b.id}" ${isSel ? 'checked' : ''} class="w-4 h-4">
+          <input type="radio" name="barbeiro" ${isSel ? 'checked' : ''} class="w-4 h-4">
         `;
         container.appendChild(div);
       });
-    }
-
-    function selecionarBarbeiro(divElement, bObj) {
-      barbeiroEscolhido = bObj;
-      document.querySelectorAll('.card-barbeiro').forEach(card => {
-        card.className = "card-barbeiro p-4 border-2 border-zinc-800 rounded-2xl hover:border-zinc-700 cursor-pointer transition-all bg-zinc-950/40 flex items-center justify-between";
-        card.querySelector('input[type="radio"]').checked = false;
-      });
-      divElement.className = "card-barbeiro p-4 border-2 theme-border rounded-2xl bg-zinc-800/80 cursor-pointer transition-all flex items-center justify-between";
-      divElement.querySelector('input[type="radio"]').checked = true;
     }
 
     function voltarParaPasso0() {
       document.getElementById('step-1').classList.add('hidden');
       document.getElementById('step-0').classList.remove('hidden');
       document.getElementById('next-btn').innerHTML = '<span>Avançar para Serviços</span> <i data-lucide="arrow-right" class="w-4 h-4"></i>';
-      currentStep = 0;
-      lucide.createIcons();
+      currentStep = 0; lucide.createIcons();
     }
 
     function irParaPasso(passo) {
@@ -316,46 +289,28 @@
     }
 
     function carregarServicosCliente() {
-      const servicos = barbeiroEscolhido.servicos && barbeiroEscolhido.servicos.length ? barbeiroEscolhido.servicos : [
-        { id: 'corte', nome: 'Corte de Cabelo', preco: 40, duracao: 40 }
-      ];
+      const servicos = barbeiroEscolhido.servicos && barbeiroEscolhido.servicos.length ? barbeiroEscolhido.servicos : [{ id: 'corte', nome: 'Corte de Cabelo', preco: 40, duracao: 40 }];
       const container = document.getElementById('container-servicos-cliente');
       container.innerHTML = '';
       
       servicos.forEach((s, idx) => {
         if (idx === 0 && !servicoEscolhido) servicoEscolhido = s;
-        const label = document.createElement('label');
         const isSel = servicoEscolhido && servicoEscolhido.nome === s.nome;
-        
-        label.className = isSel
-          ? "card-servico flex items-center justify-between p-3.5 border-2 theme-border rounded-2xl bg-zinc-800/80 cursor-pointer transition-all"
-          : "card-servico flex items-center justify-between p-3.5 border-2 border-zinc-800 rounded-2xl hover:border-zinc-700 cursor-pointer transition-all bg-zinc-950/40";
-        
-        label.onclick = () => selecionarServicoCard(label, s);
+        const label = document.createElement('label');
+        label.className = isSel ? "flex items-center justify-between p-3.5 border-2 theme-border rounded-2xl bg-zinc-800/80 cursor-pointer" : "flex items-center justify-between p-3.5 border-2 border-zinc-800 rounded-2xl cursor-pointer bg-zinc-950/40";
+        label.onclick = () => { servicoEscolhido = s; carregarServicosCliente(); };
         label.innerHTML = `
           <div class="flex items-center gap-3">
-            <input type="radio" name="servico" value="${s.nome}" ${isSel ? 'checked' : ''} class="w-4 h-4">
+            <input type="radio" name="servico" ${isSel ? 'checked' : ''} class="w-4 h-4">
             <div>
               <div class="font-bold text-sm text-zinc-100">${s.nome}</div>
-              <div class="text-xs text-zinc-400">⏱️ ${s.duracao || 30} minutos</div>
+              <div class="text-xs text-zinc-400">⏱️ ${s.duracao || 30} min</div>
             </div>
           </div>
-          <span class="preco-tag font-bold text-sm ${isSel ? 'theme-text' : 'text-zinc-400'}">R$ ${Number(s.preco).toLocaleString()}</span>
+          <span class="font-bold text-sm ${isSel ? 'theme-text' : 'text-zinc-400'}">R$ ${s.preco}</span>
         `;
         container.appendChild(label);
       });
-    }
-
-    function selecionarServicoCard(labelElement, servicoObj) {
-      servicoEscolhido = servicoObj;
-      document.querySelectorAll('.card-servico').forEach(card => {
-        card.className = "card-servico flex items-center justify-between p-3.5 border-2 border-zinc-800 rounded-2xl hover:border-zinc-700 cursor-pointer transition-all bg-zinc-950/40";
-        card.querySelector('.preco-tag').className = "preco-tag font-bold text-sm text-zinc-400";
-        card.querySelector('input[type="radio"]').checked = false;
-      });
-      labelElement.className = "card-servico flex items-center justify-between p-3.5 border-2 theme-border rounded-2xl bg-zinc-800/80 cursor-pointer transition-all";
-      labelElement.querySelector('.preco-tag').className = "preco-tag font-bold text-sm theme-text";
-      labelElement.querySelector('input[type="radio"]').checked = true;
     }
 
     async function carregarHorariosCliente() {
@@ -363,107 +318,79 @@
       if (!dataSel) return;
       
       const partes = dataSel.split('-');
-      const dataObj = new Date(partes[0], partes[1] - 1, partes[2]);
-      const diaDaSemana = dataObj.getDay();
-      
+      const diaDaSemana = new Date(partes[0], partes[1] - 1, partes[2]).getDay();
       const diasFechados = barbeiroEscolhido.diasFechados || [];
 
       if (diasFechados.includes(diaDaSemana)) {
         document.getElementById('alerta-dia-fechado').classList.remove('hidden');
         document.getElementById('wrapper-horarios').classList.add('hidden');
         document.getElementById('next-btn').disabled = true;
-        document.getElementById('next-btn').classList.add('opacity-50', 'cursor-not-allowed');
         return;
       } else {
         document.getElementById('alerta-dia-fechado').classList.add('hidden');
         document.getElementById('wrapper-horarios').classList.remove('hidden');
         document.getElementById('next-btn').disabled = false;
-        document.getElementById('next-btn').classList.remove('opacity-50', 'cursor-not-allowed');
       }
 
       const duracaoServico = servicoEscolhido ? (servicoEscolhido.duracao || 30) : 30;
       document.getElementById('info-duracao-servico').innerText = `Duração exata: ${duracaoServico} min`;
 
-      // Mapeia bloqueios específicos deste barbeiro
-      let bloqueadosPorData = {};
+      let bloqueadosDoDia = [];
       if (barbeiroEscolhido.agendamentos) {
         barbeiroEscolhido.agendamentos.forEach(ag => {
-          if (ag.data && ag.horariosOcupados) {
-            if (!bloqueadosPorData[ag.data]) bloqueadosPorData[ag.data] = [];
-            bloqueadosPorData[ag.data] = [...new Set([...bloqueadosPorData[ag.data], ...ag.horariosOcupados])];
+          if (ag.data === dataSel && ag.horariosOcupados) {
+            bloqueadosDoDia = [...bloqueadosDoDia, ...ag.horariosOcupados];
           }
         });
       }
 
-      const bloqueadosDoDia = bloqueadosPorData[dataSel] || [];
       const pausasPadrao = barbeiroEscolhido.horariosPausaPadrao || [];
-
       const grid = document.getElementById('horarios-grid-cliente');
       grid.innerHTML = '';
       horarioEscolhido = "";
 
-      let inicioMin = 8 * 60;
-      const fimMin = 20 * 60;
+      let inicioMin = 8 * 60; const fimMin = 20 * 60;
       let horariosGerados = [];
 
       while (inicioMin + duracaoServico <= fimMin) {
         const horaInicioStr = minutosParaHora(inicioMin);
         let indisponivel = false;
-        let horariosAfetadosTemp = [];
+        let afetadosTemp = [];
         
         let mCheck = inicioMin;
         while (mCheck < inicioMin + duracaoServico) {
           const slotStr = minutosParaHora(Math.floor(mCheck / 30) * 30);
-          if (pausasPadrao.includes(slotStr) || bloqueadosDoDia.includes(slotStr) || bloqueadosDoDia.includes(minutosParaHora(mCheck))) {
-            indisponivel = true;
-            break;
+          if (pausasPadrao.includes(slotStr) || bloqueadosDoDia.includes(slotStr)) {
+            indisponivel = true; break;
           }
-          horariosAfetadosTemp.push(minutosParaHora(mCheck));
+          afetadosTemp.push(minutosParaHora(mCheck));
           mCheck += 30;
         }
 
-        if (!indisponivel) {
-          horariosGerados.push({ hora: horaInicioStr, afetados: horariosAfetadosTemp });
-        }
+        if (!indisponivel) horariosGerados.push({ hora: horaInicioStr, afetados: afetadosTemp });
         inicioMin += duracaoServico; 
       }
 
       if (horariosGerados.length === 0) {
-        grid.innerHTML = `<p class="col-span-full text-xs text-zinc-500 text-center py-4">Nenhum horário disponível para esta data.</p>`;
+        grid.innerHTML = `<p class="col-span-full text-xs text-zinc-500 text-center py-4">Nenhum horário disponível.</p>`;
         return;
       }
 
       horariosGerados.forEach((item, idx) => {
         const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.innerText = item.hora;
-
+        btn.type = 'button'; btn.innerText = item.hora;
         if (idx === 0) {
-          horarioEscolhido = item.hora;
-          horariosOcupadosPeloServico = item.afetados;
-          btn.className = "time-btn p-2 border-2 theme-border bg-zinc-800 theme-text rounded-lg text-xs font-bold transition-all shadow-sm";
+          horarioEscolhido = item.hora; horariosOcupadosPeloServico = item.afetados;
+          btn.className = "p-2 border-2 theme-border bg-zinc-800 theme-text rounded-lg text-xs font-bold shadow-sm";
         } else {
-          btn.className = "time-btn p-2 border border-zinc-800 bg-zinc-950/40 rounded-lg text-xs font-bold text-zinc-300 hover:border-zinc-700 transition-all";
+          btn.className = "p-2 border border-zinc-800 bg-zinc-950/40 rounded-lg text-xs font-bold text-zinc-300";
         }
-        
-        btn.onclick = () => selecionarHorario(btn, item.hora, item.afetados);
+        btn.onclick = () => {
+          horarioEscolhido = item.hora; horariosOcupadosPeloServico = item.afetados;
+          carregarHorariosCliente();
+        };
         grid.appendChild(btn);
       });
-    }
-
-    function selecionarHorario(btn, hora, horariosAfetados) {
-      horarioEscolhido = hora;
-      horariosOcupadosPeloServico = horariosAfetados;
-      document.querySelectorAll('.time-btn').forEach(b => {
-        b.className = "time-btn p-2 border border-zinc-800 bg-zinc-950/40 rounded-lg text-xs font-bold text-zinc-300 hover:border-zinc-700 transition-all";
-      });
-      btn.className = "time-btn p-2 border-2 theme-border bg-zinc-800 theme-text rounded-lg text-xs font-bold transition-all shadow-sm";
-    }
-
-    function formatarNumeroBrasil(numero) {
-      let limpo = (numero || '').replace(/\D/g, '');
-      if (!limpo.startsWith('55')) limpo = '55' + limpo;
-      return limpo;
     }
 
     async function nextStep() {
@@ -473,69 +400,32 @@
       } else if (currentStep === 1) {
         irParaPasso(2);
       } else if (currentStep === 2) {
-        if (!horarioEscolhido) { alert("Selecione um horário disponível!"); return; }
+        if (!horarioEscolhido) { alert("Selecione um horário!"); return; }
         irParaPasso(3);
       } else if (currentStep === 3) {
         const nome = document.getElementById('nome-cliente').value.trim();
         const whats = document.getElementById('whats-cliente').value.trim();
-        
-        if (!nome || nome.length < 3) { alert("Insira o seu nome completo!"); return; }
-        if (!whats || whats.replace(/\D/g, '').length < 8) { alert("Insira um número de WhatsApp válido."); return; }
+        if (!nome || !whats) { alert("Preencha todos os campos!"); return; }
 
-        const dataFormatada = inputData.value.split('-').reverse().join('/');
+        await window.fsAddDoc(window.fsCollection(window.dbFirestore, "agendamentos_bellan_multi"), {
+          barbeiroId: barbeiroEscolhido.id, cliente: nome, servico: servicoEscolhido.nome,
+          preco: servicoEscolhido.preco, data: inputData.value, horario: horarioEscolhido,
+          whatsapp: whats, horariosOcupados: horariosOcupadosPeloServico, criadoEm: new Date().toISOString()
+        });
 
-        if (window.dbFirestore) {
-          try {
-            await window.fsAddDoc(window.fsCollection(window.dbFirestore, "agendamentos_bellan_multi"), {
-              barbeiroId: barbeiroEscolhido.id,
-              cliente: nome,
-              servico: servicoEscolhido.nome,
-              preco: servicoEscolhido.preco,
-              data: inputData.value,
-              horario: horarioEscolhido,
-              whatsapp: whats,
-              horariosOcupados: horariosOcupadosPeloServico,
-              criadoEm: new Date().toISOString()
-            });
-          } catch (e) {
-            console.error(e);
-          }
-        }
-
-        const textoMensagem = `✅ *NOVO AGENDAMENTO CONFIRMADO!*\n\n` +
-          `💈 *${dadosGlobais.nomeBarbearia || 'Barbearia'}*\n` +
-          `👤 *Profissional:* ${barbeiroEscolhido.nome}\n` +
-          `👤 *Cliente:* ${nome}\n` +
-          `✂️ *Serviço:* ${servicoEscolhido.nome} (R$ ${Number(servicoEscolhido.preco).toLocaleString()})\n` +
-          `📅 *Data:* ${dataFormatada}\n` +
-          `⏰ *Horário:* ${horarioEscolhido} (${servicoEscolhido.duracao || 30} min)\n` +
-          `📲 *Contato:* ${whats}\n\n` +
-          `_Agendado via AgendaZap_`;
-
-        navigator.clipboard.writeText(textoMensagem).catch(err => console.log(err));
+        const texto = `✅ Agendamento Confirmado com ${barbeiroEscolhido.nome} para ${nome} às ${horarioEscolhido} (${servicoEscolhido.nome}).`;
+        navigator.clipboard.writeText(texto);
 
         document.getElementById('step-3').classList.add('hidden');
         document.getElementById('steps-indicator-wrapper').classList.add('hidden');
         document.getElementById('footer-actions').classList.add('hidden');
         document.getElementById('step-4').classList.remove('hidden');
 
-        const containerBotoes = document.getElementById('container-botoes-manuais');
-        containerBotoes.innerHTML = '';
-
-        if (barbeiroEscolhido.whats && barbeiroEscolhido.whats.trim() !== "") {
-          let numeroFinal = formatarNumeroBrasil(barbeiroEscolhido.whats);
-          let linkCanal = `https://api.whatsapp.com/send?phone=${numeroFinal}&text=${encodeURIComponent(textoMensagem)}`;
-          
-          document.getElementById('aviso-instrucao-canal').innerText = `Mensagem copiada! A abrir o WhatsApp de ${barbeiroEscolhido.nome}.`;
-          
-          let btnAbrir = document.createElement('a');
-          btnAbrir.href = linkCanal;
-          btnAbrir.target = "_blank";
-          btnAbrir.className = `w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg`;
-          btnAbrir.innerHTML = `<i data-lucide="external-link" class="w-4 h-4"></i> Abrir WhatsApp de ${barbeiroEscolhido.nome}`;
-          containerBotoes.appendChild(btnAbrir);
-        } else {
-          document.getElementById('aviso-instrucao-canal').innerText = "Mensagem copiada para a memória! Podes colá-la onde quiseres.";
+        if (barbeiroEscolhido.whats) {
+          let num = barbeiroEscolhido.whats.replace(/\D/g, '');
+          if (!num.startsWith('55')) num = '55' + num;
+          const link = `https://api.whatsapp.com/send?phone=${num}&text=${encodeURIComponent(texto)}`;
+          document.getElementById('container-botoes-manuais').innerHTML = `<a href="${link}" target="_blank" class="w-full py-3 bg-emerald-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2">Abrir WhatsApp</a>`;
         }
       }
       lucide.createIcons();
