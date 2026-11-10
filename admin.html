@@ -143,7 +143,7 @@
       </button>
     </div>
 
-    <!-- AGENDA DO DIA -->
+    <!-- AGENDA DO DIA COM BOTÃO DIRETO WHATSAPP -->
     <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 space-y-4">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-zinc-800 pb-3">
         <h2 class="text-base font-bold text-zinc-200 flex items-center gap-2">
@@ -212,7 +212,7 @@
       <div class="space-y-2" id="lista-servicos-admin"></div>
     </div>
 
-    <!-- DIAS E PAUSAS (Expandido das 07:00 às 22:00) -->
+    <!-- DIAS E PAUSAS -->
     <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 space-y-4">
       <h2 class="text-base font-bold text-zinc-200 flex items-center gap-2 border-b border-zinc-800 pb-3">
         <i data-lucide="calendar-off" class="w-5 h-5 text-zinc-400"></i> Dias de Funcionamento & Pausas Fixas (07:00 às 22:00)
@@ -254,7 +254,6 @@
       return dadosGerais.barbeiros.find(b => b.id === barbeiroAtivoId) || dadosGerais.barbeiros[0];
     }
 
-    // Intervalo expandido das 07:00 às 22:00
     function gerarHorarios30min() {
       const lista = [];
       for (let h = 7; h <= 22; h++) {
@@ -457,19 +456,38 @@
       doDia.sort((a, b) => a.horario.localeCompare(b.horario));
       doDia.forEach(ag => {
         const div = document.createElement('div');
-        div.className = "p-3 bg-zinc-900 border border-zinc-800 rounded-xl flex items-center justify-between gap-3";
+        div.className = "p-3 bg-zinc-900 border border-zinc-800 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3";
+        
+        const textoLembrete = `Olá ${ag.cliente}, tudo bem? Aqui é da ${dadosGerais.nomeBarbearia || 'Barbearia'}. Passando para confirmar/lembrar do seu agendamento hoje às ${ag.horario} (${ag.servico}). Tudo certo?`;
+
+        let numeroLimpo = (ag.whatsapp || '').replace(/\D/g, '');
+        let linkWhats = "#";
+        if (numeroLimpo.length > 5) {
+          if (!numeroLimpo.startsWith('55')) numeroLimpo = '55' + numeroLimpo;
+          linkWhats = `https://api.whatsapp.com/send?phone=${numeroLimpo}&text=${encodeURIComponent(textoLembrete)}`;
+        }
+
         div.innerHTML = `
           <div>
             <div class="text-sm font-bold text-zinc-200">${ag.horario} - ${ag.cliente}</div>
             <div class="text-xs text-zinc-400">${ag.servico} | Contato: ${ag.whatsapp}</div>
           </div>
-          <button onclick="copiarTexto('Olá ${ag.cliente}, lembrete do agendamento hoje às ${ag.horario} (${ag.servico}).')" class="px-3 py-2 bg-zinc-800 text-white rounded-lg text-xs font-bold">Copiar Msg</button>
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            ${numeroLimpo.length > 5 ? `
+              <a href="${linkWhats}" target="_blank" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold flex items-center gap-1 justify-center flex-1 sm:flex-initial">
+                <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> WhatsApp
+              </a>` : ''}
+            <button onclick="copiarTexto('${textoLembrete.replace(/'/g, "\\'")}')" class="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-bold flex items-center gap-1 justify-center flex-1 sm:flex-initial">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copiar Msg
+            </button>
+          </div>
         `;
         container.appendChild(div);
       });
+      lucide.createIcons();
     }
 
-    function copiarTexto(t) { navigator.clipboard.writeText(t); alert("Copiado!"); }
+    function copiarTexto(t) { navigator.clipboard.writeText(t); alert("📋 Mensagem copiada!"); }
 
     function renderizarServicos() {
       const bAtivo = obterDadosBarbeiroAtivo();
