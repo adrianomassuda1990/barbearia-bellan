@@ -55,12 +55,13 @@
         </p>
       </div>
 
+      <!-- Indicador de Passos -->
       <div id="steps-indicator-wrapper" class="flex border-b border-zinc-800 bg-zinc-950/50 px-4 py-3 text-xs font-medium text-zinc-400 justify-between">
         <button type="button" onclick="voltarParaPasso0()" id="step-0-indicator" class="theme-text font-bold flex items-center gap-1">0. Profissional</button>
         <span>&gt;</span>
-        <button type="button" id="step-1-indicator" class="flex items-center gap-1">1. Serviço</button>
+        <button type="button" onclick="irParaPasso(1)" id="step-1-indicator" class="flex items-center gap-1">1. Serviço</button>
         <span>&gt;</span>
-        <button type="button" id="step-2-indicator" class="flex items-center gap-1">2. Horário</button>
+        <button type="button" onclick="irParaPasso(2)" id="step-2-indicator" class="flex items-center gap-1">2. Horário</button>
         <span>&gt;</span>
         <button type="button" id="step-3-indicator" class="flex items-center gap-1">3. Fim</button>
       </div>
@@ -253,9 +254,12 @@
 
     function voltarParaPasso0() {
       document.getElementById('step-1').classList.add('hidden');
+      document.getElementById('step-2').classList.add('hidden');
+      document.getElementById('step-3').classList.add('hidden');
       document.getElementById('step-0').classList.remove('hidden');
       document.getElementById('next-btn').innerHTML = '<span>Avançar para Serviços</span> <i data-lucide="arrow-right" class="w-4 h-4"></i>';
-      currentStep = 0; lucide.createIcons();
+      currentStep = 0; 
+      lucide.createIcons();
     }
 
     function irParaPasso(passo) {
@@ -348,7 +352,6 @@
       grid.innerHTML = '';
       horarioEscolhido = "";
 
-      // Expandido das 07:00 às 22:00
       let inicioMin = 7 * 60; const fimMin = 22 * 60;
       let horariosGerados = [];
 
