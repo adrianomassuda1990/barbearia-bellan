@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Administrativo - Barbearia do Bellan</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Firebase SDKs via CDN -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA0lLW90e0p-bGgVvcuK6yqSHqdGE4gKhc",
+      authDomain: "site-danilo-config.firebaseapp.com",
+      projectId: "site-danilo-config",
+      storageBucket: "site-danilo-config.firebasestorage.app",
+      messagingSenderId: "109226079646",
+      appId: "1:109226079646:web:256beb9a3d91afda33928f"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.dbFirestore = db;
+    window.fsDoc = doc;
+    window.fsSetDoc = setDoc;
+    window.fsGetDoc = getDoc;
+    window.fsCollection = collection;
+    window.fsAddDoc = addDoc;
+    window.fsGetDocs = getDocs;
+
+    if (typeof carregarDadosServidor === 'function') {
+      carregarDadosServidor();
+    }
+  </script>
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen p-4 sm:p-8 flex justify-center items-start">
+
+  <!-- TELA DE LOGIN -->
+  <div id="login-screen" class="w-full max-w-sm bg-zinc-900 p-6 rounded-2xl border border-zinc-800 shadow-2xl space-y-4 mt-12">
+    <div class="text-center space-y-2">
+      <div id="login-icon-box" class="w-12 h-12 bg-zinc-800 text-zinc-300 rounded-full flex items-center justify-center mx-auto border border-zinc-700">
+        <i data-lucide="lock" class="w-6 h-6"></i>
+      </div>
+      <h2 class="text-lg font-bold text-zinc-100">Barbearia do Bellan</h2>
+      <p class="text-xs text-zinc-400">Insira a senha do painel administrativo</p>
+    </div>
+    <input type="password" id="input-senha" placeholder="Digite a senha..." class="w-full p-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-zinc-100 focus:ring-2 focus:ring-zinc-400 focus:outline-none text-center">
+    <button onclick="verificarSenha()" id="btn-login-cor" class="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-bold text-sm rounded-xl transition-all shadow-lg">
+      Entrar no Painel
+    </button>
+  </div>
+
+  <!-- CONTEÚDO DO PAINEL -->
+  <div id="admin-content" class="w-full max-w-4xl space-y-6 hidden">
+    
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-zinc-900 p-6 rounded-2xl border border-zinc-800 shadow-xl">
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 id="titulo-topo-admin" class="text-2xl font-bold text-zinc-100 uppercase tracking-tight">Barbearia do Bellan</h1>
+          <span id="badge-tema-cor" class="bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs px-2.5 py-1 rounded-full font-bold">Gestão</span>
+        </div>
+        <p class="text-xs text-zinc-400 mt-1">Painel de Controlo Completo (Firebase Nuvem)</p>
+      </div>
+      <button onclick="sair()" class="text-xs text-zinc-400 hover:text-red-400 flex items-center gap-1 transition-all">
+        <i data-lucide="log-out" class="w-4 h-4"></i> Sair
+      </button>
+    </div>
+
+    <!-- 1. IDENTIDADE VISUAL, LOGÓTIPO & PALETA DE CORES -->
+    <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 space-y-4">
+      <h2 class="text-base font-bold text-zinc-200 flex items-center gap-2 border-b border-zinc-800 pb-3">
+        <i data-lucide="image" class="w-5 h-5 text-zinc-400"></i> Nome, Logótipo & Paleta de Cores
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="space-y-2">
+          <label class="block text-xs font-bold uppercase text-zinc-400">Nome da Barbearia</label>
+          <input type="text" id="input-nome-barbearia" class="w-full p-2.5 bg-zinc-950 border border-zinc-800 rounded-lg text-sm text-zinc-100 focus:outline-none">
+        </div>
+        <div class="space-y-2">
+          <label class="block text-xs font-bold uppercase text-zinc-400">Logótipo (Telemóvel/PC)</label>
+          <input type="file" id="input-arquivo-logo" accept="image/*" onchange="converterLogoParaBase64(this)" class="w-full p-2 bg-zinc-950 border border-zinc-800 rounded-lg text-xs text-zinc-400 file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-zinc-700 file:text-white hover:file:bg-zinc-600">
+        </div>
+        <div class="space-y-2">
+          <label class="block text-xs font-bold uppercase text-zinc-400">Paleta de Cores (Tema)</label>
+          <select id="input-cor-tema" class="w-full p-2.5 bg-zinc-950 border border-zinc-800 rounded-lg text-sm text-zinc-100 focus:outline-none">
+            <option value="zinc">Preto & Cinza (Clássico)</option>
+            <option value="amber">Dourado / Luxo</option>
+            <option value="emerald">Verde Executivo</option>
+            <option value="blue">Azul Sofisticado</option>
+          </select>
+        </div>
+      </div>
+      <div id="preview-logo-container" class="hidden items-center gap-3 pt-2">
+        <span class="text-xs text-zinc-400">Logótipo carregado:</span>
+        <img id="preview-logo-img" src="" class="w-12 h-12 rounded-full object-cover border border-zinc-700">
+      </div>
+      <button onclick="salvarConfiguracoesServidor('Identidade e cores atualizadas com sucesso!')" class="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-bold text-sm rounded-xl transition-all shadow-lg">
+        Guardar Identidade & Cores
+      </button>
+    </div>
+
+    <!-- 2. CANAIS & SEGURANÇA -->
+    <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 space-y-4">
+      <h2 class="text-base font-bold text-zinc-200 flex items-center gap-2 border-b border-zinc-800 pb-3">
+        <i data-lucide="share-2" class="w-5 h-5 text-zinc-400"></i> Canais & Senha do Painel
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-2">
+          <label class="block text-xs font-bold uppercase text-zinc-400">WhatsApp</label>
+          <input type="tel" id="input-whats-yukio" class="w-full p-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-100 focus:outline-none">
+        </div>
+        <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-2">
+          <label class="block text-xs font-bold uppercase text-zinc-400">Instagram (@)</label>
+          <input type="text" id="input-instagram-yukio" class="w-full p-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-100 focus:outline-none">
+        </div>
+        <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-2">
+          <label class="block text-xs font-bold uppercase text-zinc-400">Nova Senha</label>
+          <input type="password" id="input-nova-senha" placeholder="Deixe em branco" class="w-full p-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-100 focus:outline-none">
+        </div>
+      </div>
+      <button onclick="salvarConfiguracoesServidor('Canais e segurança atualizados!')" class="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-bold text-sm rounded-xl transition-all shadow-lg">
+        Guardar Canais e Senha
+      </button>
+    </div>
+
+    <!-- 3. AGENDA DO DIA & ENVIO EM MASSA -->
+    <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 space-y-4">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-zinc-800 pb-3">
+        <h2 class="text-base font-bold text-zinc-200 flex items-center gap-2">
+          <i data-lucide="calendar" class="w-5 h-5 text-zinc-400"></i> Agenda & Lembretes para os Clientes do Dia
+        </h2>
+        <button onclick="copiarResumoDiaParaTodos()" class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs rounded-lg transition-all flex items-center gap-1.5 shadow-md">
+          <i data-lucide="share-2" class="w-4 h-4"></i> Copiar Lista Completa do Dia
+        </button>
+      </div>
+
+      <div class="flex items-center bg-zinc-950 p-4 rounded-xl border border-zinc-800">
+        <div class="w-full">
+          <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Selecionar Data da Agenda</label>
+          <input type="date" id="filtro-data-agenda" onchange="renderizarAgendaDoDia()" class="w-full p-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-100 font-bold focus:outline-none">
+        </div>
+      </div>
+      <div id="lista-agendamentos-dia" class="space-y-3 max-h-72 overflow-y-auto">
+        <p class="text-xs text-zinc-500 text-center py-4">Selecione uma data para ver os clientes agendados.</p>
+      </div>
+    </div>
+
+    <!-- 4. CRIAR RESERVA MANUAL -->
+    <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 space-y-4">
+      <h2 class="text-base font-bold text-zinc-200 flex items-center gap-2 border-b border-zinc-800 pb-3">
+        <i data-lucide="user-plus" class="w-5 h-5 text-zinc-400"></i> Criar Agendamento Manual (Barbeiro)
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-zinc-950 p-4 rounded-xl border border-zinc-800">
+        <div>
+          <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Nome do Cliente</label>
+          <input type="text" id="manual-nome" placeholder="Ex: Carlos Silva" class="w-full p-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-100 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Serviço</label>
+          <select id="manual-servico" class="w-full p-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-100 focus:outline-none"></select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Data</label>
+          <input type="date" id="manual-data" class="w-full p-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-100 font-bold focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Horário Inicial</label>
+          <select id="manual-horario" class="w-full p-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-100 focus:outline-none"></select>
+        </div>
+        <div class="sm:col-span-2">
+          <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Contato / Telefone</label>
+          <input type="text" id="manual-whats" placeholder="Ex: (19) 99999-9999" class="w-full p-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-100 focus:outline-none">
+        </div>
+      </div>
+      <button onclick="criarAgendamentoManual()" class="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-sm rounded-xl transition-all shadow-lg">
+        Registar Agendamento Manual
+      </button>
+    </div>
+
+    <!-- 5. GERENCIAR SERVIÇOS & DURAÇÃO -->
+    <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 space-y-4">
+      <h2 class="text-base font-bold text-zinc-200 flex items-center gap-2 border-b border-zinc-800 pb-3">
+        <i data-lucide="scissors" class="w-5 h-5 text-zinc-400"></i> Serviços, Valores (R$) & Duração (Minutos)
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-2 bg-zinc-950 p-3 rounded-xl border border-zinc-800">
+        <input type="text" id="novo-servico-nome" placeholder="Nome do Serviço" class="p-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-100 focus:outline-none">
+        <input type="number" id="novo-servico-preco" placeholder="Valor (R$)" class="p-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-100 font-bold focus:outline-none">
+        <input type="number" id="novo-servico-duracao" placeholder="Minutos" class="p-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-100 focus:outline-none">
+        <button onclick="adicionarServico()" class="py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs rounded-lg transition-all flex items-center justify-center gap-1">
+          <i data-lucide="plus" class="w-4 h-4"></i> Adicionar
+        </button>
+      </div>
+      <div class="space-y-2" id="lista-servicos-admin"></div>
+    </div>
+
+    <!-- 6. DIAS DE FUNCIONAMENTO & PAUSAS FIXAS -->
+    <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 space-y-4">
+      <h2 class="text-base font-bold text-zinc-200 flex items-center gap-2 border-b border-zinc-800 pb-3">
+        <i data-lucide="calendar-off" class="w-5 h-5 text-zinc-400"></i> Dias de Funcionamento & Pausas Fixas
+      </h2>
+      <div class="space-y-2">
+        <label class="block text-xs font-bold uppercase text-zinc-400">Dias da Semana</label>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5" id="grid-dias-semana"></div>
+      </div>
+
+      <div class="pt-4 border-t border-zinc-800 space-y-2">
+        <h3 class="text-sm font-bold text-zinc-200">Horários Padrão em que NÃO Atende (Pausas Fixas)</h3>
+        <div class="grid grid-cols-4 sm:grid-cols-8 gap-2 p-3 bg-zinc-950 rounded-xl border border-zinc-800 max-h-48 overflow-y-auto" id="grid-horarios-pausa-padrao"></div>
+      </div>
+
+      <button onclick="salvarConfiguracoesServidor('Dias e horários guardados com sucesso!')" class="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-bold text-sm rounded-xl transition-all">
+        Guardar Dias e Horários de Pausa
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    let dadosServidor = {
+      nomeBarbearia: "Barbearia do Bellan",
+      logoUrl: "",
+      senhaBellan: "1234",
+      whatsBellan: "",
+      instagramBellan: "",
+      corTema: "zinc",
+      servicos: [
+        { id: 'corte', nome: 'Corte de Cabelo', preco: 40, duracao: 40 },
+        { id: 'barba', nome: 'Barba', preco: 30, duracao: 30 }
+      ],
+      diasFechados: [],
+      horariosPausaPadrao: [],
+      horariosBloqueadosPorData: {},
+      agendamentos: []
+    };
+
+    function gerarHorarios30min() {
+      const lista = [];
+      for (let h = 8; h <= 20; h++) {
+        const horaStr = h < 10 ? `0${h}` : `${h}`;
+        lista.push(`${horaStr}:00`);
+        if (h < 20) lista.push(`${horaStr}:30`);
+      }
+      return lista;
+    }
+
+    const horariosLista = gerarHorarios30min();
+    const diasSemana = [
+      { id: 0, nome: 'Domingo' }, { id: 1, nome: 'Segunda-feira' }, { id: 2, nome: 'Terça-feira' },
+      { id: 3, nome: 'Quarta-feira' }, { id: 4, nome: 'Quinta-feira' }, { id: 5, nome: 'Sexta-feira' }, { id: 6, nome: 'Sábado' }
+    ];
+
+    const hojeIso = new Date().toISOString().split('T')[0];
+    document.getElementById('manual-data').value = hojeIso;
+    document.getElementById('filtro-data-agenda').value = hojeIso;
+
+    async function carregarDadosServidor() {
+      if (!window.dbFirestore) return;
+      try {
+        const docRef = window.fsDoc(window.dbFirestore, "configuracoes", "barbearia_bellan");
+        const docSnap = await window.fsGetDoc(docRef);
+        
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data) {
+            dadosServidor = { ...dadosServidor, ...data };
+          }
+        }
+
+        const agendamentosRef = window.fsCollection(window.dbFirestore, "agendamentos_bellan");
+        const agendamentosSnap = await window.fsGetDocs(agendamentosRef);
+        let listaAgendamentos = [];
+        
+        agendamentosSnap.forEach((docItem) => {
+          listaAgendamentos.push(docItem.data());
+        });
+        dadosServidor.agendamentos = listaAgendamentos;
+
+      } catch (err) {
+        console.error("Erro ao carregar dados do Firebase:", err);
+      }
+    }
+
+    function converterLogoParaBase64(input) {
+      const file = input.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          dadosServidor.logoUrl = e.target.result;
+          document.getElementById('preview-logo-img').src = e.target.result;
+          document.getElementById('preview-logo-container').classList.remove('hidden');
+          document.getElementById('preview-logo-container').classList.add('flex');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    async function salvarConfiguracoesServidor(mensagemSucesso = "Configurações salvas!") {
+      dadosServidor.nomeBarbearia = document.getElementById('input-nome-barbearia').value.trim() || "Barbearia do Bellan";
+      dadosServidor.whatsBellan = document.getElementById('input-whats-yukio').value.trim();
+      dadosServidor.instagramBellan = document.getElementById('input-instagram-yukio').value.trim();
+      dadosServidor.corTema = document.getElementById('input-cor-tema').value;
+      
+      const novaSenha = document.getElementById('input-nova-senha').value.trim();
+      if (novaSenha) dadosServidor.senhaBellan = novaSenha;
+
+      if (!window.dbFirestore) {
+        alert("Erro: Firebase não inicializado.");
+        return;
+      }
+
+      try {
+        await window.fsSetDoc(window.fsDoc(window.dbFirestore, "configuracoes", "barbearia_bellan"), {
+          nomeBarbearia: dadosServidor.nomeBarbearia,
+          logoUrl: dadosServidor.logoUrl,
+          senhaBellan: dadosServidor.senhaBellan,
+          whatsBellan: dadosServidor.whatsBellan,
+          instagramBellan: dadosServidor.instagramBellan,
+          corTema: dadosServidor.corTema,
+          servicos: dadosServidor.servicos,
+          diasFechados: dadosServidor.diasFechados,
+          horariosPausaPadrao: dadosServidor.horariosPausaPadrao,
+          horariosBloqueadosPorData: dadosServidor.horariosBloqueadosPorData || {}
+        });
+
+        if (novaSenha) document.getElementById('input-nova-senha').value = '';
+        alert(mensagemSucesso);
+        await carregarDadosServidor();
+        renderizarTudo();
+      } catch (err) {
+        console.error(err);
+        alert("Erro ao salvar no Firestore.");
+      }
+    }
+
+    async function verificarSenha() {
+      await carregarDadosServidor();
+      const senhaDigitada = document.getElementById('input-senha').value;
+      if (senhaDigitada === (dadosServidor.senhaBellan || "1234")) {
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('admin-content').classList.remove('hidden');
+        
+        document.getElementById('input-nome-barbearia').value = dadosServidor.nomeBarbearia || "Barbearia do Bellan";
+        document.getElementById('input-whats-yukio').value = dadosServidor.whatsBellan || "";
+        document.getElementById('input-instagram-yukio').value = dadosServidor.instagramBellan || "";
+        document.getElementById('input-cor-tema').value = dadosServidor.corTema || "zinc";
+        document.getElementById('titulo-topo-admin').innerText = dadosServidor.nomeBarbearia;
+
+        if (dadosServidor.logoUrl) {
+          document.getElementById('preview-logo-img').src = dadosServidor.logoUrl;
+          document.getElementById('preview-logo-container').classList.remove('hidden');
+          document.getElementById('preview-logo-container').classList.add('flex');
+        }
+        
+        renderizarTudo();
+      } else {
+        alert("Senha incorreta!");
+      }
+    }
+
+    function renderizarAgendaDoDia() {
+      const dataFiltro = document.getElementById('filtro-data-agenda').value;
+      const container = document.getElementById('lista-agendamentos-dia');
+      container.innerHTML = '';
+
+      const agendamentos = dadosServidor.agendamentos || [];
+      const doDia = agendamentos.filter(a => a.data === dataFiltro);
+
+      if (doDia.length === 0) {
+        container.innerHTML = `<p class="text-xs text-zinc-500 text-center py-4">Nenhum agendamento para este dia.</p>`;
+        return;
+      }
+
+      doDia.sort((a, b) => a.horario.localeCompare(b.horario));
+
+      doDia.forEach(ag => {
+        const div = document.createElement('div');
+        div.className = "p-3 bg-zinc-900 border border-zinc-800 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3";
+        
+        const textoLembrete = `Olá ${ag.cliente}, tudo bem? Aqui é da ${dadosServidor.nomeBarbearia || 'Barbearia do Bellan'}. Passando para lembrar do seu agendamento hoje às ${ag.horario} (${ag.servico}). Confirmado?`;
+
+        let numeroLimpo = (ag.whatsapp || '').replace(/\D/g, '');
+        let linkWhats = "#";
+        if (numeroLimpo.length > 5) {
+          if (!numeroLimpo.startsWith('55')) numeroLimpo = '55' + numeroLimpo;
+          linkWhats = `https://api.whatsapp.com/send?phone=${numeroLimpo}&text=${encodeURIComponent(textoLembrete)}`;
+        }
+
+        div.innerHTML = `
+          <div>
+            <div class="text-sm font-bold text-zinc-200">${ag.horario} - ${ag.cliente}</div>
+            <div class="text-xs text-zinc-400">${ag.servico} | Contato: ${ag.whatsapp}</div>
+          </div>
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            ${numeroLimpo.length > 5 ? `
+              <a href="${linkWhats}" target="_blank" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold flex items-center gap-1 justify-center flex-1 sm:flex-initial">
+                <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> WhatsApp
+              </a>` : ''}
+            <button onclick="copiarTexto('${textoLembrete.replace(/'/g, "\\'")}')" class="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-bold flex items-center gap-1 justify-center flex-1 sm:flex-initial">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copiar Msg
+            </button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+      lucide.createIcons();
+    }
+
+    function copiarTexto(texto) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(texto).then(() => {
+          alert("📋 Mensagem copiada com sucesso!");
+        }).catch(() => {
+          forcarCopiaManual(texto);
+        });
+      } else {
+        forcarCopiaManual(texto);
+      }
+    }
+
+    function forcarCopiaManual(texto) {
+      const textarea = document.createElement('textarea');
+      textarea.value = texto;
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        alert("📋 Mensagem copiada com sucesso!");
+      } catch (err) {
+        alert("Não foi possível copiar automaticamente.");
+      }
+      document.body.removeChild(textarea);
+    }
+
+    function copiarResumoDiaParaTodos() {
+      const dataFiltro = document.getElementById('filtro-data-agenda').value;
+      const agendamentos = dadosServidor.agendamentos || [];
+      const doDia = agendamentos.filter(a => a.data === dataFiltro);
+
+      if (doDia.length === 0) {
+        alert("Não há agendamentos nesta data para copiar.");
+        return;
+      }
+
+      doDia.sort((a, b) => a.horario.localeCompare(b.horario));
+      const dataFormatada = dataFiltro.split('-').reverse().join('/');
+
+      let resumo = `📅 *AGENDA - ${dataFormatada}*\n`;
+      resumo += `💈 *${dadosServidor.nomeBarbearia || 'Barbearia do Bellan'}*\n\n`;
+
+      doDia.forEach((ag, idx) => {
+        resumo += `${idx + 1}. *${ag.horario}* - ${ag.cliente} (${ag.servico})\n`;
+      });
+
+      copiarTexto(resumo);
+    }
+
+    function renderizarServicos() {
+      const container = document.getElementById('lista-servicos-admin');
+      const selectManual = document.getElementById('manual-servico');
+      container.innerHTML = '';
+      selectManual.innerHTML = '';
+
+      dadosServidor.servicos.forEach((s, index) => {
+        const div = document.createElement('div');
+        div.className = "p-3 bg-zinc-950 rounded-xl border border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-3";
+        div.innerHTML = `
+          <input type="text" value="${s.nome}" onchange="atualizarServico(${index}, 'nome', this.value)" class="bg-transparent text-sm font-bold text-zinc-200 focus:outline-none flex-1 w-full">
+          <div class="flex items-center gap-2 w-full sm:w-auto justify-between">
+            <div class="flex items-center gap-1">
+              <span class="text-xs text-zinc-500">R$</span>
+              <input type="number" value="${s.preco}" onchange="atualizarServico(${index}, 'preco', this.value)" class="w-20 p-1.5 bg-zinc-900 border border-zinc-700 rounded-lg text-sm text-zinc-100 font-bold text-right focus:outline-none">
+            </div>
+            <div class="flex items-center gap-1">
+              <input type="number" value="${s.duracao || 30}" onchange="atualizarServico(${index}, 'duracao', this.value)" class="w-16 p-1.5 bg-zinc-900 border border-zinc-700 rounded-lg text-sm text-zinc-200 text-right focus:outline-none">
+              <span class="text-xs text-zinc-500">min</span>
+            </div>
+            <button onclick="removerServico(${index})" class="p-2 text-zinc-500 hover:text-red-400 transition-all"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+          </div>
+        `;
+        container.appendChild(div);
+
+        const opt = document.createElement('option');
+        opt.value = JSON.stringify(s);
+        opt.innerText = `${s.nome} (R$${s.preco} - ${s.duracao || 30}min)`;
+        selectManual.appendChild(opt);
+      });
+
+      const selectHorario = document.getElementById('manual-horario');
+      selectHorario.innerHTML = '';
+      horariosLista.forEach(h => {
+        const optH = document.createElement('option');
+        optH.value = h;
+        optH.innerText = h;
+        selectHorario.appendChild(optH);
+      });
+
+      lucide.createIcons();
+    }
+
+    async function adicionarServico() {
+      const nome = document.getElementById('novo-servico-nome').value;
+      const preco = document.getElementById('novo-servico-preco').value;
+      const duracao = document.getElementById('novo-servico-duracao').value || 30;
+      if (!nome || !preco) { alert("Preencha nome e valor!"); return; }
+      
+      dadosServidor.servicos.push({ id: 'srv-' + Date.now(), nome, preco: Number(preco), duracao: Number(duracao) });
+      document.getElementById('novo-servico-nome').value = '';
+      document.getElementById('novo-servico-preco').value = '';
+      document.getElementById('novo-servico-duracao').value = '';
+      renderizarServicos();
+      await salvarConfiguracoesServidor("Serviço adicionado!");
+    }
+
+    async function atualizarServico(index, campo, valor) {
+      dadosServidor.servicos[index][campo] = campo === 'nome' ? valor : Number(valor);
+      await salvarConfiguracoesServidor("Serviço atualizado!");
+    }
+
+    async function removerServico(index) {
+      dadosServidor.servicos.splice(index, 1);
+      renderizarServicos();
+      await salvarConfiguracoesServidor("Serviço removido!");
+    }
+
+    async function criarAgendamentoManual() {
+      const nome = document.getElementById('manual-nome').value.trim();
+      const servicoObj = JSON.parse(document.getElementById('manual-servico').value);
+      const data = document.getElementById('manual-data').value;
+      const horarioInicio = document.getElementById('manual-horario').value;
+      const whats = document.getElementById('manual-whats').value.trim() || "Manual";
+
+      if (!nome || !data) { alert("Preencha o nome e a data!"); return; }
+
+      const duracaoMin = servicoObj.duracao || 30;
+      const blocosNecessarios = Math.ceil(duracaoMin / 30);
+      const idxInicio = horariosLista.indexOf(horarioInicio);
+      
+      let horariosOcupados = [];
+      for (let i = 0; i < blocosNecessarios; i++) {
+        if (idxInicio + i < horariosLista.length) {
+          horariosOcupados.push(horariosLista[idxInicio + i]);
+        }
+      }
+
+      if (!window.dbFirestore) {
+        alert("Erro: Firebase não inicializado.");
+        return;
+      }
+
+      try {
+        await window.fsAddDoc(window.fsCollection(window.dbFirestore, "agendamentos_bellan"), {
+          cliente: nome,
+          servico: servicoObj.nome,
+          preco: servicoObj.preco,
+          data: data,
+          horario: horarioInicio,
+          whatsapp: whats,
+          horariosOcupados: horariosOcupados,
+          criadoEm: new Date().toISOString()
+        });
+
+        alert(`Agendamento de ${nome} criado com sucesso!`);
+        document.getElementById('manual-nome').value = '';
+        document.getElementById('manual-whats').value = '';
+        await carregarDadosServidor();
+        renderizarAgendaDoDia();
+      } catch (err) {
+        console.error(err);
+        alert("Erro ao criar agendamento no Firestore.");
+      }
+    }
+
+    function renderizarDias() {
+      const container = document.getElementById('grid-dias-semana');
+      container.innerHTML = '';
+      diasSemana.forEach(dia => {
+        const isFechado = dadosServidor.diasFechados.includes(dia.id);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.onclick = () => toggleDia(dia.id);
+        btn.className = isFechado 
+          ? "p-3 bg-red-500/10 border border-red-500/40 text-red-400 font-bold rounded-xl flex flex-col items-center gap-1 text-xs" 
+          : "p-3 bg-zinc-800 border border-zinc-700 text-zinc-200 font-bold rounded-xl flex flex-col items-center gap-1 text-xs";
+        btn.innerHTML = `<span>${dia.nome}</span><span class="text-[10px] px-2 py-0.5 rounded font-bold ${isFechado ? 'bg-red-500/20' : 'bg-zinc-700 text-zinc-300'}">${isFechado ? 'Fechado' : 'Aberto'}</span>`;
+        container.appendChild(btn);
+      });
+    }
+
+    async function toggleDia(idDia) {
+      if (dadosServidor.diasFechados.includes(idDia)) {
+        dadosServidor.diasFechados = dadosServidor.diasFechados.filter(d => d !== idDia);
+      } else {
+        dadosServidor.diasFechados.push(idDia);
+      }
+      renderizarDias();
+      await salvarConfiguracoesServidor("Dias atualizados!");
+    }
+
+    function renderizarHorariosPausaPadrao() {
+      const grid = document.getElementById('grid-horarios-pausa-padrao');
+      grid.innerHTML = '';
+      if (!dadosServidor.horariosPausaPadrao) dadosServidor.horariosPausaPadrao = [];
+
+      horariosLista.forEach(hora => {
+        const isPausa = dadosServidor.horariosPausaPadrao.includes(hora);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = isPausa 
+          ? "p-2.5 bg-red-500/10 border border-red-500/40 text-red-400 font-bold rounded-xl flex flex-col items-center gap-0.5 text-xs transition-all" 
+          : "p-2.5 bg-zinc-800 border border-zinc-700 text-zinc-200 font-bold rounded-xl flex flex-col items-center gap-0.5 text-xs transition-all";
+        
+        btn.innerHTML = `<span>${hora}</span><span class="text-[10px] px-1.5 py-0.2 rounded font-bold ${isPausa ? 'bg-red-500/20 text-red-400' : 'bg-zinc-700 text-zinc-300'}">${isPausa ? 'Indisponível' : 'Disponível'}</span>`;
+
+        btn.onclick = () => {
+          if (!dadosServidor.horariosPausaPadrao) dadosServidor.horariosPausaPadrao = [];
+          if (dadosServidor.horariosPausaPadrao.includes(hora)) {
+            dadosServidor.horariosPausaPadrao = dadosServidor.horariosPausaPadrao.filter(h => h !== hora);
+          } else {
+            dadosServidor.horariosPausaPadrao.push(hora);
+          }
+          renderizarHorariosPausaPadrao();
+        };
+        grid.appendChild(btn);
+      });
+    }
+
+    function renderizarTudo() {
+      renderizarServicos();
+      renderizarDias();
+      renderizarHorariosPausaPadrao();
+      renderizarAgendaDoDia();
+    }
+
+    function sair() { window.location.href = 'index.html'; }
+  </script>
+</body>
+</html>
