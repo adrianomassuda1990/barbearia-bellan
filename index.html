@@ -194,7 +194,6 @@
           }
         }
 
-        // Garante obrigatoriamente que o Bellan está na lista
         if (!dadosGlobais.barbeiros.some(b => b.id === 'bellan')) {
           dadosGlobais.barbeiros.unshift({ id: 'bellan', nome: 'Bellan', whats: '', servicos: [{ id: 'corte', nome: 'Corte', preco: 40, duracao: 40 }], diasFechados: [], horariosPausaPadrao: [] });
         }
@@ -349,7 +348,8 @@
       grid.innerHTML = '';
       horarioEscolhido = "";
 
-      let inicioMin = 8 * 60; const fimMin = 20 * 60;
+      // Expandido das 07:00 às 22:00
+      let inicioMin = 7 * 60; const fimMin = 22 * 60;
       let horariosGerados = [];
 
       while (inicioMin + duracaoServico <= fimMin) {
