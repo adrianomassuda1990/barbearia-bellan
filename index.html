@@ -416,25 +416,54 @@
         const whats = document.getElementById('whats-cliente').value.trim();
         if (!nome || !whats) { alert("Preencha todos os campos!"); return; }
 
-        await window.fsAddDoc(window.fsCollection(window.dbFirestore, "agendamentos_bellan_multi"), {
-          barbeiroId: barbeiroEscolhido.id, cliente: nome, servico: servicoEscolhido.nome,
-          preco: servicoEscolhido.preco, data: inputData.value, horario: horarioEscolhido,
-          whatsapp: whats, horariosOcupados: horariosOcupadosPeloServico, criadoEm: new Date().toISOString()
-        });
+        const btnFinalizar = document.getElementById('next-btn');
+        btnFinalizar.disabled = true;
+        btnFinalizar.innerText = "A verificar disponibilidade...";
 
-        const texto = `✅ Agendamento Confirmado com ${barbeiroEscolhido.nome} para ${nome} às ${horarioEscolhido} (${servicoEscolhido.nome}).`;
-        navigator.clipboard.writeText(texto);
+        try {
+          const agendamentosRef = window.fsCollection(window.dbFirestore, "agendamentos_bellan_multi");
+          const agendamentosSnap = await window.fsGetDocs(agendamentosRef);
+          
+          let conflito = false;
+          agendamentosSnap.forEach((docItem) => {
+            const ag = docItem.data();
+            if (ag.barbeiroId === barbeiroEscolhido.id && ag.data === inputData.value && ag.horariosOcupados) {
+              const temIntersecao = horariosOcupadosPeloServico.some(h => ag.horariosOcupados.includes(h));
+              if (temIntersecao) conflito = true;
+            }
+          });
 
-        document.getElementById('step-3').classList.add('hidden');
-        document.getElementById('steps-indicator-wrapper').classList.add('hidden');
-        document.getElementById('footer-actions').classList.add('hidden');
-        document.getElementById('step-4').classList.remove('hidden');
+          if (conflito) {
+            alert("⚠️ Este horário acabou de ser ocupado por outro cliente! Por favor, escolha outro horário.");
+            btnFinalizar.disabled = false;
+            irParaPasso(2);
+            return;
+          }
 
-        if (barbeiroEscolhido.whats) {
-          let num = barbeiroEscolhido.whats.replace(/\D/g, '');
-          if (!num.startsWith('55')) num = '55' + num;
-          const link = `https://api.whatsapp.com/send?phone=${num}&text=${encodeURIComponent(texto)}`;
-          document.getElementById('container-botoes-manuais').innerHTML = `<a href="${link}" target="_blank" class="w-full py-3 bg-emerald-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2">Abrir WhatsApp</a>`;
+          await window.fsAddDoc(agendamentosRef, {
+            barbeiroId: barbeiroEscolhido.id, cliente: nome, servico: servicoEscolhido.nome,
+            preco: servicoEscolhido.preco, data: inputData.value, horario: horarioEscolhido,
+            whatsapp: whats, horariosOcupados: horariosOcupadosPeloServico, criadoEm: new Date().toISOString()
+          });
+
+          const texto = `✅ Agendamento Confirmado com ${barbeiroEscolhido.nome} para ${nome} às ${horarioEscolhido} (${servicoEscolhido.nome}).`;
+          navigator.clipboard.writeText(texto);
+
+          document.getElementById('step-3').classList.add('hidden');
+          document.getElementById('steps-indicator-wrapper').classList.add('hidden');
+          document.getElementById('footer-actions').classList.add('hidden');
+          document.getElementById('step-4').classList.remove('hidden');
+
+          if (barbeiroEscolhido.whats) {
+            let num = barbeiroEscolhido.whats.replace(/\D/g, '');
+            if (!num.startsWith('55')) num = '55' + num;
+            const link = `https://api.whatsapp.com/send?phone=${num}&text=${encodeURIComponent(texto)}`;
+            document.getElementById('container-botoes-manuais').innerHTML = `<a href="${link}" target="_blank" class="w-full py-3 bg-emerald-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2">Abrir WhatsApp</a>`;
+          }
+        } catch (e) {
+          console.error(e);
+          alert("Erro ao finalizar o agendamento. Tente novamente.");
+          btnFinalizar.disabled = false;
         }
       }
       lucide.createIcons();
