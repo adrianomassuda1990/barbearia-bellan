@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -258,11 +257,11 @@
     $('input-senha').addEventListener('keydown', e => { if (e.key === 'Enter') entrar(); });
     $('input-email').addEventListener('keydown', e => { if (e.key === 'Enter') entrar(); });
 
-    // Função de saída otimizada para limpar a sessão corretamente
+    // Encerra sessão e redireciona de volta para a página inicial (index.html)
     async function sair() {
       try {
         await signOut(auth);
-        window.location.reload();
+        window.location.href = "index.html";
       } catch (e) {
         console.error("Erro ao sair:", e);
       }
