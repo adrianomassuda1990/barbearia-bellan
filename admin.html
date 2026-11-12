@@ -20,7 +20,7 @@
       <h2 class="text-lg font-bold text-zinc-100">Barbearia do Bellan</h2>
       <p class="text-xs text-zinc-400">Acesso ao painel administrativo</p>
     </div>
-    <input type="email" id="input-email" placeholder="E-mail" autocomplete="username" class="w-full p-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-zinc-100 focus:outline-none">
+    <input type="text" id="input-email" placeholder="Usuário (ex: bellan)" autocomplete="username" autocapitalize="none" class="w-full p-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-zinc-100 focus:outline-none">
     <input type="password" id="input-senha" placeholder="Senha" autocomplete="current-password" class="w-full p-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-zinc-100 focus:outline-none">
     <button onclick="entrar()" class="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-bold text-sm rounded-xl transition-all shadow-lg">Entrar no Painel</button>
   </div>
@@ -169,7 +169,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, setDoc, getDoc, collection, getDocs, query, where, runTransaction }
       from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail }
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, updatePassword }
       from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const firebaseConfig = {
@@ -184,6 +184,10 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
     const CFG_REF = doc(db, "configuracoes", "barbearia_bellan_multi");
+
+    // Domínio fictício, sem caixa de e-mail real. O usuário no Firebase deve ser
+    // criado com este mesmo formato, ex.: bellan@barbearia.example.com
+    const DOMINIO_LOGIN = "@barbearia.example.com";
 
     // ---------- Constantes e estado ----------
     const ABRE_MIN = 7 * 60, FECHA_MIN = 22 * 60, DURACAO_PAUSA = 30;
@@ -224,34 +228,51 @@
     }
     const temConflito = (ini, fim, lista) => lista.some(o => ini < o.fim && fim > o.ini);
 
-    // ---------- Login (Firebase Auth) ----------
+    // ---------- Login (Firebase Auth com usuário simples) ----------
     onAuthStateChanged(auth, (user) => {
       $('login-screen').classList.toggle('hidden', !!user);
       $('admin-content').classList.toggle('hidden', !user);
       if (user) {
-        $('email-logado').textContent = user.email || '';
+        $('email-logado').textContent = (user.email || '').split('@')[0];
         carregarConfig();
       }
     });
 
     async function entrar() {
+      const usuario = $('input-email').value.trim().toLowerCase().replace(/\s+/g, '');
+      const senha = $('input-senha').value;
+
+      if (!usuario || !senha) {
+        alert("Preencha o usuário e a senha.");
+        return;
+      }
+
       try {
-        await signInWithEmailAndPassword(auth, $('input-email').value.trim(), $('input-senha').value);
+        await signInWithEmailAndPassword(auth, usuario + DOMINIO_LOGIN, senha);
         $('input-senha').value = '';
       } catch (e) {
-        alert("E-mail ou senha incorretos.");
+        console.error(e);
+        if (e.code === 'auth/too-many-requests') alert("Muitas tentativas. Aguarde alguns minutos e tente de novo.");
+        else alert("Usuário ou senha incorretos.");
       }
     }
     $('input-senha').addEventListener('keydown', e => { if (e.key === 'Enter') entrar(); });
+    $('input-email').addEventListener('keydown', e => { if (e.key === 'Enter') entrar(); });
 
     async function sair() { await signOut(auth); }
 
+    // Troca de senha direto no painel (não depende de e-mail real)
     async function redefinirSenha() {
-      const email = auth.currentUser && auth.currentUser.email;
-      if (!email) return;
-      if (!confirm(`Enviar e-mail de redefinição de senha para ${email}?`)) return;
-      try { await sendPasswordResetEmail(auth, email); toast("E-mail enviado."); }
-      catch (e) { toast("Não foi possível enviar o e-mail.", true); }
+      const nova = prompt("Digite a nova senha (mínimo 8 caracteres):");
+      if (!nova) return;
+      if (nova.length < 8) { alert("Use pelo menos 8 caracteres."); return; }
+      try {
+        await updatePassword(auth.currentUser, nova);
+        toast("Senha alterada!");
+      } catch (e) {
+        if (e.code === 'auth/requires-recent-login') alert("Por segurança, saia, entre de novo e tente trocar a senha.");
+        else { console.error(e); toast("Não foi possível trocar a senha.", true); }
+      }
     }
 
     // ---------- Configuração ----------
