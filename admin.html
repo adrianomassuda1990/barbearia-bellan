@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -185,8 +186,6 @@
     const auth = getAuth(app);
     const CFG_REF = doc(db, "configuracoes", "barbearia_bellan_multi");
 
-    // Domínio fictício, sem caixa de e-mail real. O usuário no Firebase deve ser
-    // criado com este mesmo formato, ex.: bellan@barbearia.example.com
     const DOMINIO_LOGIN = "@barbearia.example.com";
 
     // ---------- Constantes e estado ----------
@@ -259,9 +258,17 @@
     $('input-senha').addEventListener('keydown', e => { if (e.key === 'Enter') entrar(); });
     $('input-email').addEventListener('keydown', e => { if (e.key === 'Enter') entrar(); });
 
-    async function sair() { await signOut(auth); }
+    // Função de saída otimizada para limpar a sessão corretamente
+    async function sair() {
+      try {
+        await signOut(auth);
+        window.location.reload();
+      } catch (e) {
+        console.error("Erro ao sair:", e);
+      }
+    }
 
-    // Troca de senha direto no painel (não depende de e-mail real)
+    // Troca de senha direto no painel
     async function redefinirSenha() {
       const nova = prompt("Digite a nova senha (mínimo 8 caracteres):");
       if (!nova) return;
@@ -287,8 +294,8 @@
         console.error(e);
         toast("Erro ao carregar configurações.", true);
       }
-      delete dadosGerais.senhaBellan;                       // a senha agora é do Firebase Auth
-      dadosGerais.barbeiros.forEach(b => { delete b.agendamentos; delete b.horariosBloqueadosPorData; }); // dados antigos que não devem ficar no documento público
+      delete dadosGerais.senhaBellan;
+      dadosGerais.barbeiros.forEach(b => { delete b.agendamentos; delete b.horariosBloqueadosPorData; });
       if (!dadosGerais.barbeiros.some(b => b.id === 'bellan')) dadosGerais.barbeiros.unshift(barbeiroPadrao());
       if (!dadosGerais.barbeiros.some(b => b.id === barbeiroAtivoId)) barbeiroAtivoId = 'bellan';
 
@@ -366,7 +373,7 @@
         c.width = c.height = t;
         const s = Math.min(img.width, img.height);
         c.getContext('2d').drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, t, t);
-        dadosGerais.logoUrl = c.toDataURL('image/jpeg', 0.85);   // reduzido para caber no documento
+        dadosGerais.logoUrl = c.toDataURL('image/jpeg', 0.85);
         URL.revokeObjectURL(url);
         $('preview-logo-img').src = dadosGerais.logoUrl;
         $('preview-logo-container').classList.remove('hidden');
@@ -497,7 +504,6 @@
       if (btn.dataset.acao === 'cancelar') cancelarAgendamento(ag);
     });
 
-    // Cancela: remove o intervalo da agenda e apaga o agendamento (atômico).
     async function cancelarAgendamento(ag) {
       if (!confirm(`Cancelar o agendamento de ${ag.cliente} às ${ag.horario} (${ag.servico})?\n\nO horário volta a ficar livre no site.`)) return;
       const refAg = doc(db, "agendamentos_bellan_multi", ag.id);
@@ -531,7 +537,7 @@
       copiarTexto(`📅 Agenda de ${barbeiroAtivo().nome} - ${d}/${m}/${y}\n\n${linhas.join('\n')}`);
     }
 
-    // ---------- Horários dinâmicos (mesma lógica do site) ----------
+    // ---------- Horários dinâmicos ----------
     function calcularInicios(duracao, data, ocupados, pausasHHMM) {
       let minimo = ABRE_MIN;
       if (data === hojeLocal()) {
@@ -652,7 +658,7 @@
         div.innerHTML = `
           <input type="text" value="${esc(s.nome)}" data-idx="${i}" data-campo="nome" class="bg-transparent text-sm font-bold text-zinc-200 flex-1 min-w-0 focus:outline-none">
           <input type="number" value="${esc(s.preco)}" min="0" data-idx="${i}" data-campo="preco" title="Valor (R$)" class="w-20 p-1.5 bg-zinc-900 rounded text-sm font-bold text-right text-zinc-100">
-          <input type="number" value="${esc(s.duracao || 30)}" min="5" step="5" data-idx="${i}" data-campo="duracao" title="Minutos" class="w-16 p-1.5 bg-zinc-900 rounded text-sm text-right text-zinc-100">
+          <input type="number" value="${esc(s.duracao || 30)}" min="5" step="5" data-idx="${i}" data-campo="duracao" title="Minutos" class="w-16 p-1.5 bg-zinc-900 rounded text-sm font-bold text-right text-zinc-100">
           <button onclick="removerServico(${i})" class="text-red-400 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
         container.appendChild(div);
       });
